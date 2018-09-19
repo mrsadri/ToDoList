@@ -10,8 +10,30 @@ import UIKit
 
 class TableViewController: UITableViewController {
     @IBOutlet var tblView: UITableView!
+    @IBAction func addButtonAction(_ sender: UIBarButtonItem) {
+     // ---
+        var newiTem = UITextField()
+        
+        let alert = UIAlertController(title: "Add new item", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add item", style: .default) { (action) in
+            //Why I use singletone here?
+            AddAction.sharedObject.addIt(stringParameter: newiTem.text!)
+            self.tableView.reloadData()
+            
+        }
+        alert.addTextField { (alertTexfield) in
+            alertTexfield.placeholder = "What is it?"
+            newiTem = alertTexfield
+        }
+        alert.addAction(action)
+        present(alert, animated: true) {
+            print("That's it")
+        }
+    }
     
-    var itemArray = ["FirstiTem","SecondiTem","ThirdiTem"]
+    
+    static var itemArray = ["FirstiTem","SecondiTem","ThirdiTem"]
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tblView.dataSource = self
@@ -41,14 +63,14 @@ class TableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return itemArray.count
+        return TableViewController.itemArray.count
     }
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "IDofCell", for: indexPath) as! TableViewCell
         cell.labelFirst.text = "Hey Xcode, leave them kids alone"
-        cell.labelSecond.text = itemArray[indexPath.row]
+        cell.labelSecond.text = TableViewController.itemArray[indexPath.row]
         return cell
     }
 
@@ -56,10 +78,11 @@ class TableViewController: UITableViewController {
     // MARK: - TableView delegate methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .none {
+        if tableView.cellForRow(at: indexPath)?.accessoryType != .checkmark {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
             let selectedCell = tableView.cellForRow(at: indexPath) as! TableViewCell
-            self.itemArray.append(selectedCell.labelSecond.text!)
+            TableViewController.itemArray.append(selectedCell.labelSecond.text!)
+            print("Done")
             tableView.reloadData()
         } else {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
