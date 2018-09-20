@@ -13,20 +13,25 @@ class TableViewController: UITableViewController {
     @IBAction func addButtonAction(_ sender: UIBarButtonItem) {
      // ---
         var newiTem = UITextField()
+        var newiTem2 = UITextField()
         
         let alert = UIAlertController(title: "Add new item", message: "", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add item", style: .default) { (action) in
             //Why I use singletone here?
             //give the String and add it to the storage, by calling its funcion
-            CellManager.sharedObject.addToCellManagerStorage(firstString: newiTem.text!)
+            CellManager.sharedObject.addToCellManagerStorage(firstString: newiTem.text!, secondString: newiTem2.text!)
             //AddAction.sharedObject.addIt(stringParameter: newiTem.text!)
             self.tableView.reloadData()
             
         }
         alert.addTextField { (alertTexfield) in
-            alertTexfield.placeholder = "What is it?"
+            alertTexfield.placeholder = "What is its title?"
             newiTem = alertTexfield
+        }
+        alert.addTextField { (alertTexfield) in
+            alertTexfield.placeholder = "What is it?"
+            newiTem2 = alertTexfield
         }
         alert.addAction(action)
         present(alert, animated: true) {
