@@ -18,7 +18,9 @@ class TableViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add item", style: .default) { (action) in
             //Why I use singletone here?
-            AddAction.sharedObject.addIt(stringParameter: newiTem.text!)
+            //give the String and add it to the storage, by calling its funcion
+            CellManager.sharedObject.addToCellManagerStorage(firstString: newiTem.text!)
+            //AddAction.sharedObject.addIt(stringParameter: newiTem.text!)
             self.tableView.reloadData()
             
         }
@@ -33,7 +35,6 @@ class TableViewController: UITableViewController {
     }
     
     
-    static var itemArray = ["FirstiTem","SecondiTem","ThirdiTem"]
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tblView.dataSource = self
@@ -63,15 +64,15 @@ class TableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return TableViewController.itemArray.count
+        return CellManager.storage["firstPhrase"]!.count
     }
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "IDofCell", for: indexPath) as! TableViewCell
-        cell.labelFirst.text = "Hey Xcode, leave them kids alone"
-        cell.labelSecond.text = TableViewController.itemArray[indexPath.row]
-        return cell
+        
+        return CellManager.sharedObject.cellProducer(theCell: cell, pointer: indexPath.row)
     }
 
     
@@ -80,10 +81,6 @@ class TableViewController: UITableViewController {
 
         if tableView.cellForRow(at: indexPath)?.accessoryType != .checkmark {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-            let selectedCell = tableView.cellForRow(at: indexPath) as! TableViewCell
-            TableViewController.itemArray.append(selectedCell.labelSecond.text!)
-            print("Done")
-            tableView.reloadData()
         } else {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
         }
