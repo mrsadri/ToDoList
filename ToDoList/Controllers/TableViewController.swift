@@ -42,7 +42,7 @@ class TableViewController: UITableViewController {
         
         alert.addAction(action)
         alert.addAction(cancelAction)
-
+        
         present(alert, animated: true) {
             //do nothing
         }
@@ -53,17 +53,16 @@ class TableViewController: UITableViewController {
         super.viewDidLoad()
         print("didLoad is called")
         
-        //Eplanation: !! it is so wierd here, I am equalified two refrences of two static variable the same! then whenever I change one of them the scond one is changed automatically. this may produce many BUGs in the future
-        if let appenditem = CellManager.sharedObject.defaults.array(forKey: "firstPhraseArrayinPList") as? [String] {
-            CellManager.sharedObject.storageArray["firstPhrase"] = appenditem
-            print("append iTem is called")
-        }
-        if let appenditem2 = CellManager.sharedObject.defaults.array(forKey: "secondPhraseArrayinPList") as? [String] {
-            CellManager.sharedObject.storageArray["secondPhrase"] = appenditem2
+        
+        if let i = (CellManager.sharedObject.defaults.array(forKey: "firstPhrase")?.count) {
+            for index in 0...i-1 {
+                let newItemM = CelliTem.init(title: CellManager.sharedObject.defaults.array(forKey: "firstPhrase")![index] as! String, description: CellManager.sharedObject.defaults.array(forKey: "secondPhrase")![index] as! String, cellState: (CellManager.sharedObject.defaults.array(forKey: "stateKey")![index] as! Bool))
+                CellManager.sharedObject.storageArray.append(newItemM)
+                
+            }
+            tblView.reloadData()
         }
         
-        //self.tblView.dataSource = self
-        //self.tblView.delegate = self
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -89,7 +88,7 @@ class TableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return CellManager.sharedObject.storageArray["firstPhrase"]!.count
+        return (CellManager.sharedObject.storageArray).count
     }
     
     
@@ -103,13 +102,15 @@ class TableViewController: UITableViewController {
     
     // MARK: - TableView delegate methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //front
+        CellManager.sharedObject.storageArray[indexPath.row].cellStateM = !CellManager.sharedObject.storageArray[indexPath.row].cellStateM
         
-        if tableView.cellForRow(at: indexPath)?.accessoryType != .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        }
+        //back
+        CellManager.sharedObject.stateKeeper[indexPath.row] = !CellManager.sharedObject.stateKeeper[indexPath.row]
         
+        CellManager.sharedObject.defaults.set(CellManager.sharedObject.stateKeeper, forKey: "stateKey")
+
+        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -159,3 +160,6 @@ class TableViewController: UITableViewController {
      */
     
 }
+
+// BuG: empty cell should not be added
+// BuG: 

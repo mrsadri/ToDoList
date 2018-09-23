@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		CE03BB7A214F4BAA008DB397 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE03BB79214F4BAA008DB397 /* TableViewCell.swift */; };
 		CE18B8FC214EE6BA00C81E41 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE18B8FB214EE6BA00C81E41 /* TableViewController.swift */; };
+		CE91D6A22157D13100DE16B4 /* CelliTem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE91D6A12157D13100DE16B4 /* CelliTem.swift */; };
 		CEC5D363214EE16A0046FA92 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC5D362214EE16A0046FA92 /* AppDelegate.swift */; };
 		CEC5D368214EE16A0046FA92 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEC5D366214EE16A0046FA92 /* Main.storyboard */; };
 		CEC5D36A214EE16B0046FA92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEC5D369214EE16B0046FA92 /* Assets.xcassets */; };
@@ -19,6 +20,7 @@
 /* Begin PBXFileReference section */
 		CE03BB79214F4BAA008DB397 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		CE18B8FB214EE6BA00C81E41 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
+		CE91D6A12157D13100DE16B4 /* CelliTem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelliTem.swift; sourceTree = "<group>"; };
 		CEC5D35F214EE16A0046FA92 /* ToDoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEC5D362214EE16A0046FA92 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CEC5D367214EE16A0046FA92 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -39,9 +41,45 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CE91D69D2157D04300DE16B4 /* Data Model */ = {
+			isa = PBXGroup;
+			children = (
+				CEE1C25521527580008EC374 /* CellManager.swift */,
+				CE91D6A12157D13100DE16B4 /* CelliTem.swift */,
+			);
+			path = "Data Model";
+			sourceTree = "<group>";
+		};
+		CE91D69E2157D05200DE16B4 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				CE03BB79214F4BAA008DB397 /* TableViewCell.swift */,
+				CE18B8FB214EE6BA00C81E41 /* TableViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		CE91D69F2157D05F00DE16B4 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CEC5D366214EE16A0046FA92 /* Main.storyboard */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		CE91D6A02157D07400DE16B4 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CEC5D369214EE16B0046FA92 /* Assets.xcassets */,
+				CEC5D36B214EE16B0046FA92 /* LaunchScreen.storyboard */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		CEC5D356214EE16A0046FA92 = {
 			isa = PBXGroup;
 			children = (
+				CEC5D362214EE16A0046FA92 /* AppDelegate.swift */,
 				CEC5D361214EE16A0046FA92 /* ToDoList */,
 				CEC5D360214EE16A0046FA92 /* Products */,
 			);
@@ -58,14 +96,11 @@
 		CEC5D361214EE16A0046FA92 /* ToDoList */ = {
 			isa = PBXGroup;
 			children = (
-				CEC5D362214EE16A0046FA92 /* AppDelegate.swift */,
-				CEC5D366214EE16A0046FA92 /* Main.storyboard */,
-				CEC5D369214EE16B0046FA92 /* Assets.xcassets */,
-				CEC5D36B214EE16B0046FA92 /* LaunchScreen.storyboard */,
+				CE91D69D2157D04300DE16B4 /* Data Model */,
+				CE91D69F2157D05F00DE16B4 /* Views */,
+				CE91D69E2157D05200DE16B4 /* Controllers */,
+				CE91D6A02157D07400DE16B4 /* Supporting Files */,
 				CEC5D36E214EE16B0046FA92 /* Info.plist */,
-				CE18B8FB214EE6BA00C81E41 /* TableViewController.swift */,
-				CE03BB79214F4BAA008DB397 /* TableViewCell.swift */,
-				CEE1C25521527580008EC374 /* CellManager.swift */,
 			);
 			path = ToDoList;
 			sourceTree = "<group>";
@@ -144,6 +179,7 @@
 				CE03BB7A214F4BAA008DB397 /* TableViewCell.swift in Sources */,
 				CEE1C25621527580008EC374 /* CellManager.swift in Sources */,
 				CEC5D363214EE16A0046FA92 /* AppDelegate.swift in Sources */,
+				CE91D6A22157D13100DE16B4 /* CelliTem.swift in Sources */,
 				CE18B8FC214EE6BA00C81E41 /* TableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
