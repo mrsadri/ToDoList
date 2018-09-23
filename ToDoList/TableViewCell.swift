@@ -9,7 +9,7 @@
 import UIKit
 
 class TableViewCell: UITableViewCell {
-
+    
     @IBOutlet weak var labelFirst: UILabel!
     @IBOutlet weak var labelSecond: UILabel!
     
