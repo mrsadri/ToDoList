@@ -53,16 +53,8 @@ class TableViewController: UITableViewController {
         super.viewDidLoad()
         print("didLoad is called")
         
-        
-        if let i = (CellManager.sharedObject.defaults.array(forKey: "firstPhrase")?.count) {
-            for index in 0...i-1 {
-                let newItemM = CelliTem.init(title: CellManager.sharedObject.defaults.array(forKey: "firstPhrase")![index] as! String, description: CellManager.sharedObject.defaults.array(forKey: "secondPhrase")![index] as! String, cellState: (CellManager.sharedObject.defaults.array(forKey: "stateKey")![index] as! Bool))
-                CellManager.sharedObject.storageArray.append(newItemM)
-                
-            }
-            tblView.reloadData()
-        }
-        
+        CellManager.sharedObject.fetchDataFromPListToCellManager()
+        tblView.reloadData()
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -75,9 +67,6 @@ class TableViewController: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    
-    
     
     // MARK: - TableView data source
     
@@ -102,14 +91,8 @@ class TableViewController: UITableViewController {
     
     // MARK: - TableView delegate methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //front
-        CellManager.sharedObject.storageArray[indexPath.row].cellStateM = !CellManager.sharedObject.storageArray[indexPath.row].cellStateM
-        
-        //back
-        CellManager.sharedObject.stateKeeper[indexPath.row] = !CellManager.sharedObject.stateKeeper[indexPath.row]
-        
-        CellManager.sharedObject.defaults.set(CellManager.sharedObject.stateKeeper, forKey: "stateKey")
 
+        CellManager.sharedObject.stateChanger(pointer: indexPath.row)
         tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
