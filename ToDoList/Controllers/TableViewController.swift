@@ -6,8 +6,12 @@
 //  Copyright © 2018 MSadri. All rights reserved.
 //
 
+
+import Alamofire
+import SwiftyJSON
 import UIKit
 
+var dataFilePathGlobalVarray : URL? = nil
 class TableViewController: UITableViewController {
     
     
@@ -21,7 +25,9 @@ class TableViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add item", style: .default) { (action) in
             //Why I use singletone here?
-            CellManager.sharedObject.addToCellManagerStorage(firstString: newiTem.text!, secondString: newiTem2.text!)
+            CellManager.sharedObject.addNewCell(firstString: newiTem.text!, secondString: newiTem2.text!)
+            
+            //- -   -   -   -   -   -
             self.tableView.reloadData()
         }
         
@@ -48,12 +54,30 @@ class TableViewController: UITableViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        if TalkToServer.sharedObject.tokenKeeper == "" {
+            let loginPage = storyboard?.instantiateViewController(withIdentifier: "loginPageId") as! LoginPageVC
+            present(loginPage, animated: true, completion: nil)
+        } else {
+            print("Hello Back \(TalkToServer.sharedObject.userData.firstName)")
+        }
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("didLoad is called")
+        //----temp
+
+        //----
         
-        CellManager.sharedObject.fetchDataFromPListToCellManager()
+        let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+        
+        print("\nThe path is: \(String(describing: dataFilePath))")
+        
+        dataFilePathGlobalVarray = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("ItemsByEncoder.plist")
+        
+        PLDBManager.sharedObject.fetchDataFromPListToArray()
         tblView.reloadData()
         
         // Uncomment the following line to preserve selection between presentations
@@ -77,7 +101,7 @@ class TableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return (CellManager.sharedObject.storageArray).count
+        return (CellManager.sharedObject.arrayOfCelliTems).count
     }
     
     

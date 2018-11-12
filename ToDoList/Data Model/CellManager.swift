@@ -9,65 +9,44 @@
 import Foundation
 class CellManager {
     
-    let defaults = UserDefaults.standard
+    //let defaults = UserDefaults.standard
+    //2 replacing NSCodere instead of UserDefault:
+    
     let firstPhraseKey  : String = "firstPhrase"
     let secondPhraseKey : String = "secondPhrase"
     
-    var storageArray        = [CelliTem]()
-    var titleKeeper         = [String]()
-    var descriptionKeepr    = [String]()
-    var stateKeeper         = [Bool]()
+    var arrayOfCelliTems    = [CelliTem]()
+//    var titleKeeper         = [String]()
+//    var descriptionKeepr    = [String]()
+//    var stateKeeper         = [Bool]()
+        
+    static let sharedObject = CellManager()
     
-    // a refrence to keeper array will be here to access the data
-    
-    static let sharedObject = CellManager() 
-    
-    private init() {
-        print("I am created")
-    }
+    private init() {}
     //---------------------------------------------------------------------
     
     
-    func fetchDataFromPListToCellManager() {
-        
-        /* if plist keep something:
-         1. we change it to CelliTem
-         2. we fill the keeper arrays
-         3. Reload the Table*/
-        
-        if let i = (self.defaults.array(forKey: "firstPhrase")?.count) {
-            
-            //1: get data from plist and produce CelliTems
-            for index in 0...i-1 {
-                let newItemM = CelliTem.init(title: self.defaults.array(forKey: "firstPhrase")![index] as! String, description: self.defaults.array(forKey: "secondPhrase")![index] as! String, cellState: (self.defaults.array(forKey: "stateKey")![index] as! Bool))
-                self.storageArray.append(newItemM)
-            }
-            
-            //2: set Keeper arrays:
-            self.titleKeeper        = self.defaults.array(forKey: "firstPhrase")    as! [String]
-            self.descriptionKeepr   = self.defaults.array(forKey: "secondPhrase")   as! [String]
-            self.stateKeeper        = self.defaults.array(forKey: "stateKey")       as! [Bool]
-            
-            //3: Reload the tableView
-            // this will call on viewDidLoad (first page)
-        }
-    }
+
     
     
     
     //
-    func addToCellManagerStorage(firstString: String = "firstEmpty", secondString: String = "secondEmpty", stateOfCheckmark : Bool = false) {
+    func addNewCell(firstString: String = "firstEmpty", secondString: String = "secondEmpty", stateOfCheckmark : Bool = false) {
         
         let newItem = CelliTem.init(title: firstString, description: secondString)
-        storageArray.append(newItem)
+        arrayOfCelliTems.append(newItem)
         
-        titleKeeper.append(firstString)
-        descriptionKeepr.append(secondString)
-        stateKeeper.append(stateOfCheckmark)
+        PLDBManager.sharedObject.updatePlist(from: arrayOfCelliTems)
         
-        defaults.set(titleKeeper,       forKey: "firstPhrase")
-        defaults.set(descriptionKeepr,  forKey: "secondPhrase")
-        defaults.set(stateKeeper,       forKey: "stateKey")
+//        titleKeeper.append(firstString)
+//        descriptionKeepr.append(secondString)
+//        stateKeeper.append(stateOfCheckmark)
+        
+        
+        //write keepers array into defaults
+//        defaults.set(titleKeeper     ,forKey: "firstPhrase" )
+//        defaults.set(descriptionKeepr,forKey: "secondPhrase")
+//        defaults.set(stateKeeper     ,forKey: "stateKey"    )
     }
     
     
@@ -75,9 +54,9 @@ class CellManager {
     //Explnation: this func by using the pointer and storageArray will produce a modified cell
     func cellProducer(theCell : TableViewCell, pointer : Int) -> TableViewCell {
         
-        theCell.labelFirst.text     = self.storageArray[pointer].titleM
-        theCell.labelSecond.text    = self.storageArray[pointer].descriptionM
-        theCell.accessoryType       = self.storageArray[pointer].cellStateM ? .checkmark : .none
+        theCell.labelFirst.text  = self.arrayOfCelliTems[pointer].titleM
+        theCell.labelSecond.text = self.arrayOfCelliTems[pointer].descriptionM
+        theCell.accessoryType    = self.arrayOfCelliTems[pointer].cellStateM ? .checkmark : .none
         
         return theCell
     }
@@ -85,8 +64,14 @@ class CellManager {
     
     func stateChanger(pointer : Int) {
         
-        self.storageArray[pointer].cellStateM   = !self.storageArray[pointer].cellStateM
-        self.stateKeeper[pointer]               = !self.stateKeeper[pointer]
-        self.defaults.set(self.stateKeeper, forKey: "stateKey")
+        self.arrayOfCelliTems[pointer].cellStateM   = !self.arrayOfCelliTems[pointer].cellStateM
+        PLDBManager.sharedObject.updatePlist(from: arrayOfCelliTems)
+       // self.stateKeeper[pointer] = !self.stateKeeper[pointer]
+       // self.defaults.set(self.stateKeeper, forKey: "stateKey")
     }
+    
+    func deleteCell(pointer: Int){
+        
+    }
+
 }
