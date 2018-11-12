@@ -7,7 +7,7 @@
 //
 
 import Foundation
-struct CelliTem {
+struct CelliTem : Codable {
     var titleM : String = "Title"
     var descriptionM : String = "Description"
     var cellStateM : Bool = false
