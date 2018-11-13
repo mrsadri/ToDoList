@@ -54,14 +54,19 @@ class TableViewController: UITableViewController {
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
         if TalkToServer.sharedObject.tokenKeeper == "" {
-            let loginPage = storyboard?.instantiateViewController(withIdentifier: "loginPageId") as! LoginPageVC
-            present(loginPage, animated: true, completion: nil)
+            let loginPage = self.storyboard?.instantiateViewController(withIdentifier: "loginPageId") as! LoginPageVC
+            self.present(loginPage, animated: true, completion: nil)
         } else {
             print("Hello Back \(TalkToServer.sharedObject.userData.firstName)")
         }
+        
+//    TalkToServer.sharedObject.register(firstName: "Mohsen", lastName: "Ebrahimi", password: "ali123", email: "mohsen@gmail.com")
+//        TalkToServer.sharedObject.createGroup(groupName: "Akbar!")
+    }
     }
     
     
