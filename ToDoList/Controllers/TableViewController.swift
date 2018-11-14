@@ -63,6 +63,8 @@ class TableViewController: UITableViewController {
         } else {
             print("Hello Back \(TalkToServer.sharedObject.userData.firstName)")
         }
+            //TalkToServer.sharedObject.updateTask(task_id: "37", group_id: "24", taskName: "new Name for this Task", taskDescription: "Description is Updated")
+            TalkToServer.sharedObject.getGroup()
         
 //    TalkToServer.sharedObject.register(firstName: "Mohsen", lastName: "Ebrahimi", password: "ali123", email: "mohsen@gmail.com")
 //        TalkToServer.sharedObject.createGroup(groupName: "Akbar!")
