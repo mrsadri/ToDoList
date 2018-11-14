@@ -10,6 +10,16 @@ import Alamofire
 import Foundation
 
 class TalkToServer {
+    var timer:Timer?
+    var groupIDKeeperTemp : [String] = []
+    var isReadyToReload : Bool = false {
+        willSet(new){
+            if new {
+                self.dataModelPrinter()
+            }
+        }
+    }
+    
     var tokenKeeper : String = "" {
         didSet{
             //TODO: write the token to the PList evenif it is ""
@@ -190,33 +200,69 @@ class TalkToServer {
         //- BUG: GroupId is not neccesary here, just the token is matter
         
         let thisUrl = "http://buzztaab.com:8081/api/getGroup/"
-        let headers: HTTPHeaders = ["authorization" :/* "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk"*/  "Bearer +\(tokenKeeper)",
+        let headers: HTTPHeaders = ["authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk", //  "Bearer +\(tokenKeeper)",
             "Content-Type": "application/x-www-form-urlencoded"]
         let bodyparameters = ["group_id": group_id ]
         
         requester(url: thisUrl, headers: headers, bodyparameters: bodyparameters)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1){
             // BUG: server always rspond "OK"
             if self.responseKeeper.body["message"].stringValue == "ok" {
                 print(self.responseKeeper)
+                /*BUG: it will faced out of range error, the solution:
+                 step 1: empty the array at first (if requst is success)
+                 step 2: apend groupData 1by1 to a temp array
+                 step 3: call getTask by groupID to fill taskData in the array
+                 step 4 : reload the table*/
+                // BUG: IF I call getTask, the JSONkeeper which is filled by groupData is affected, please pay attention to prevent this
+                
+                // 1:
+                self.tableRows = []
+                
+                // 2:
                 //count the JSON parameters in body then write a for here
                 for index in 0...self.responseKeeper.body["body"].count-1 {
-                    /*BUG: it will faced out of range error, the solution:
-                     step 1: empty the array at first (if requst is success)
-                     step 2: apend groupData 1by1 to the array
-                     step 3: call getTask by groupID to fill taskData in the array
-                     step 4 : reload the table*/
-                    self.tableRows[index].groupData.groupID   = self.responseKeeper.body["body"][index]["id"  ].stringValue
-                    self.tableRows[index].groupData.groupName = self.responseKeeper.body["body"][index]["name"].stringValue
+                    
+                    let groupDataM : (groupName: String, groupID: String) =
+                        (groupName: self.responseKeeper.body["body"][index]["name"].stringValue,
+                         groupID:   self.responseKeeper.body["body"][index]["id"  ].stringValue)
+                    
+                    let newElementM = TabaleDataModel(groupData: groupDataM, tasksData: [])
+                    
+                    self.tableRows.append(newElementM)
+                    
+                    self.groupIDKeeperTemp.append(groupDataM.groupID)
+                    
+                    
+                    //                    self.tableRows[index].groupData.groupID   = self.responseKeeper.body["body"][index]["id"  ].stringValue
+                    //                    self.tableRows[index].groupData.groupName = self.responseKeeper.body["body"][index]["name"].stringValue
                 }
+                self.timer = Timer.scheduledTimer(timeInterval:  2, target: self, selector: #selector(self.getTasksQueue), userInfo: nil, repeats: true)
+                
+                //                for groupIndex in 0...(self.tableRows.count - 1) {
+                //                    self.getTask(group_id: self.tableRows[groupIndex].groupData.groupID)
+                //                }
+                
             } else {
+                //TODO: fill the frist row by this: "check the connection"
                 //nothing
             }
         }
         
         
     }
+    @objc func getTasksQueue(){
+        if groupIDKeeperTemp.count > 0 {
+            self.getTask(group_id: groupIDKeeperTemp[0])
+            groupIDKeeperTemp.remove(at: 0)
+        } else {
+            timer?.invalidate()
+            self.dataModelPrinter()
+        }
+        
+    }
+    
     
     func updateGroup(groupName: String, group_id: String){ //Change Group name
         
@@ -321,44 +367,99 @@ class TalkToServer {
     
     func getTask(group_id : String) {
         let thisUrl = "http://buzztaab.com:8081/api/getTask/"
-        let headers: HTTPHeaders = ["authorization" :/* "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk"*/  "Bearer +\(tokenKeeper)",
+        let headers: HTTPHeaders = ["authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk", //  "Bearer +\(tokenKeeper)",
             "Content-Type": "application/x-www-form-urlencoded"]
         let bodyparameters = ["group_id": group_id ]
         
         requester(url: thisUrl, headers: headers, bodyparameters: bodyparameters)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1){
             // BUG: server always rspond "OK"
             if self.responseKeeper.body["message"].stringValue == "ok" {
-                print(self.responseKeeper)
+                if self.responseKeeper.body["body"].count != 0 {
+                    print(self.responseKeeper.body["body"])
+                    
+                }
                 /*TODO:
-                 1: Find the section(ie Group) by groupID
-                 2: empty the list of tasks (ie TaskData)
+                 1: empty the list of tasks (ie TaskData)
+                 2: Find the section(ie Group) by groupID
                  3: then apend items 1by1 to it*/
                 
                 //count the JSON parameters in body then write a for here
                 if self.responseKeeper.body["body"].count != 0 {
+                    //1
+                    for indexM in 0...self.tableRows.count-1 {
+                        if self.tableRows[indexM].groupData.groupID == group_id {
+                            self.tableRows[indexM].tasksData = []
+                        }
+                    }
                     for index in 0...self.responseKeeper.body["body"].count-1 {
-                        let _ = (taskName:        self.responseKeeper.body["body"][index]["taskName"          ].stringValue,
-                                       taskID:          self.responseKeeper.body["body"][index]["id"                ].stringValue,
-                                       taskDescription: self.responseKeeper.body["body"][index]["taskDescription"   ].stringValue,
-                                       doneStatus: false)
+                        let taskDataM = (taskName: self.responseKeeper.body["body"][index]["taskName"       ].stringValue,
+                                         taskID:   self.responseKeeper.body["body"][index]["id"             ].stringValue,
+                                         taskDescription:  self.responseKeeper.body["body"][index]["taskDescription"].stringValue,
+                                         doneStatus: false)
+                        //2: Find the section(ie Group) by groupID
+                        for indexM in 0...self.tableRows.count-1 {
+                            if self.tableRows[indexM].groupData.groupID == group_id {
+                                //3
+                                self.tableRows[indexM].tasksData.append(taskDataM)
+                            }
+                        }
                     }
                 }
                 //TODO: write self.tableRows to Plist and reload table
                 
             } else {
                 //nothing
+                //self.timer?.invalidate()
             }
         }
         
     }
     
-    func updateTask() {
+    func updateTask(task_id : String, group_id : String , taskName : String , taskDescription : String ) {
+        //BUG: even if the task or the qroup does not exist, server respond "OK"
+        //BUG: there are two groupID
+        let thisUrl = "http://buzztaab.com:8081/api/updateTask/"
+        let headers: HTTPHeaders = ["authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk", //  "Bearer +\(tokenKeeper)",
+            "Content-Type": "application/x-www-form-urlencoded"]
+        let bodyparameters = ["task_id":task_id,
+                              "groupId":"1",
+                              "group_id":group_id ,
+                              "taskName":taskName,
+                              "taskDescription":taskDescription,
+                              "executionTime" : "fdss"]
+        
+        requester(url: thisUrl, headers: headers, bodyparameters: bodyparameters)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1){
+            //find the group:
+            if self.tableRows.count > 0 {
+                for i in 0...self.tableRows.count-1 {
+                    if self.responseKeeper.body["body"]["groupId"].stringValue == self.tableRows[i].groupData.groupID {
+                        
+                        //find the task
+                        if self.tableRows[i].tasksData.count > 0 {
+                            for j in 0...self.tableRows[i].tasksData.count-1 {
+                                if self.responseKeeper.body["body"]["id"].stringValue == self.tableRows[i].tasksData[j].taskID {
+                                    
+                                    //change the task
+                                    let newTask = (taskName: taskName, taskID: task_id, taskDescription: taskDescription, doneStatus: false)
+                                    //BUG: doneState cannot be changed on server side
+                                    self.tableRows[i].tasksData[j] = newTask
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
     }
     
     //this func will fetch all data at first step from server
-    func fetchAll() { //getGroup is doing the same action
+    func fetchAll() { //getGroup is doing the same action, so I skip this one
         /*
          1: call getGroup
          2: by every groupID call get task
@@ -382,7 +483,19 @@ class TalkToServer {
                 self.responseKeeper = ((body: defaultBodyJSON, header: JSON("")))
             }
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {}
+    }
+    
+    func dataModelPrinter () {
+        for i in 0...tableRows.count-1 {
+            print("---------------------------------")
+            print("Group ID: \(tableRows[i].groupData.groupID)\tGroup name: \(tableRows[i].groupData.groupName)")
+            print(".................................")
+            if tableRows[i].tasksData.count > 0 {
+                for j in 0...tableRows[i].tasksData.count-1 {
+                    print("Task Name: \(tableRows[i].tasksData[j].taskName)")
+                }
+            }
+        }
     }
     
 }
