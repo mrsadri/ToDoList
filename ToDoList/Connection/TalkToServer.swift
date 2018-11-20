@@ -8,16 +8,32 @@
 import SwiftyJSON
 import Alamofire
 import Foundation
+var wholeDate = [
+    TabaleDataModel(groupData : (groupName: "Group", groupID: "") , tasksData: [(taskName: "String", taskID: "1", taskDescription: "String", doneStatus: true )] ),
+    TabaleDataModel(groupData : (groupName: "Group", groupID: "") , tasksData: [(taskName: "String", taskID: "1", taskDescription: "String", doneStatus: true )] )
+]
+
+protocol toAccessHomeFunctions {
+    func loadTheApplication()
+}
 
 class TalkToServer {
     
+    var delegetionForThisClass : toAccessHomeFunctions!
+    
     var timer:Timer?
     var groupIDKeeperTemp : [String] = []
+    
     var isReadyToReload : Bool = false {
         willSet(new){
             if new {
                 self.dataModelPrinter()
-            }
+                wholeDate = tableSections
+                print("data is fetched fully")
+                self.delegetionForThisClass.loadTheApplication()
+                //HomeScreen.sharedObject.loadTheApplication()
+
+           }
         }
     }
     
@@ -230,6 +246,7 @@ class TalkToServer {
                 
                 // 2:
                 //count the JSON parameters in body then write a for here
+                if self.responseKeeper.body["body"].count > 0 {
                 for index in 0...self.responseKeeper.body["body"].count-1 {
                     
                     let groupDataM : (groupName: String, groupID: String) =
@@ -245,6 +262,7 @@ class TalkToServer {
                     
                     //                    self.tableRows[index].groupData.groupID   = self.responseKeeper.body["body"][index]["id"  ].stringValue
                     //                    self.tableRows[index].groupData.groupName = self.responseKeeper.body["body"][index]["name"].stringValue
+                }
                 }
                 self.timer = Timer.scheduledTimer(timeInterval:  2, target: self, selector: #selector(self.getTasksQueue), userInfo: nil, repeats: true)
                 
@@ -267,7 +285,8 @@ class TalkToServer {
             groupIDKeeperTemp.remove(at: 0)
         } else {
             timer?.invalidate()
-            self.dataModelPrinter()
+            isReadyToReload = true
+            //self.dataModelPrinter()
         }
         
     }

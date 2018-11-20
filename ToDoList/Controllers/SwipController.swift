@@ -15,6 +15,10 @@ extension UIColor {
 
 class SwipController : UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
+    
+    static let sharedObject = SwipController.init()
+    
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         coordinator.animate(alongsideTransition: { (_) in
             
@@ -28,13 +32,16 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
         }
     }
     
-    //let page = PageDataModel(imageName: <#T##String#>, headerText: <#T##String#>, bodyText: <#T##String#>)
+    
     let pagesData : [PageDataModel] = [
         PageDataModel(imageName: "bear_first", headerText: "Join use today in our fun and games!", bodyText: "Are you ready for loads and loads of fun? Don't wait any longer! We hope to see you in our stores soon."),
         PageDataModel(imageName: "heart_second", headerText: "Subscribe and get coupons on our daily events", bodyText: "Get notified of the savings immediately when we announce them on our website. Make sure to also give us any feedback you have."),
         PageDataModel(imageName: "leaf_third", headerText: "VIP members special services", bodyText: "")
     ]
     
+    func reloadData() {
+        //collectionView.reloadData()
+    }
     
     private let previouaseButton : UIButton = {
         let button = UIButton(type: .system)
@@ -85,9 +92,11 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
             pageController.currentPage = nextIndexPage
             collectionView?.scrollToItem(at: thisIndexPath, at: .centeredHorizontally, animated: true)
             changeButtonState(input: previouaseButton, toWhat: .enable)
-//            previouaseButton.isEnabled = true
-//            previouaseButton.setTitleColor(.myPinkColor, for: .normal)
-
+//            let nextPage = NewLoginPage()
+//            nextPage.view.backgroundColor = .black
+//            self.present(nextPage, animated: true) {
+//                //nothing
+//            }
         }
         if pageController.currentPage + 1 == pageController.numberOfPages {
             changeButtonState(input: nextButton, toWhat: .disable)
@@ -104,7 +113,7 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     
     private lazy var pageController : UIPageControl = {
         let pc = UIPageControl()
-        pc.numberOfPages = pagesData.count
+        pc.numberOfPages = wholeDate.count
         pc.currentPage = 0
         pc.pageIndicatorTintColor = UIColor.init(red: 249/255, green: 207/255, blue: 224/255, alpha: 1)
         pc.currentPageIndicatorTintColor = UIColor.myPinkColor
@@ -161,8 +170,25 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     //-----------
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupButtonControls()
         
+        //TalkToServer.sharedObject.getGroup()
+
+        //temp
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+//            if TalkToServer.sharedObject.tokenKeeper == "" {
+//                let loginPage = self.storyboard?.instantiateViewController(withIdentifier: "loginPageId") as! LoginPageVC
+//                self.present(loginPage, animated: true, completion: nil)
+//            } else {
+//                print("Hello Back \(TalkToServer.sharedObject.userData.firstName)")
+//            }
+            //TalkToServer.sharedObject.updateTask(task_id: "37", group_id: "24", taskName: "new Name for this Task", taskDescription: "Description is Updated")
+            
+            //    TalkToServer.sharedObject.register(firstName: "Mohsen", lastName: "Ebrahimi", password: "ali123", email: "mohsen@gmail.com")
+            //        TalkToServer.sharedObject.createGroup(groupName: "Akbar!")
+        }
+        //
+
+        setupButtonControls()
         collectionView?.backgroundColor = .white
         collectionView?.register(PageCell.self, forCellWithReuseIdentifier: "pageCell")
         changeButtonState(input: previouaseButton, toWhat: .disable)
@@ -195,12 +221,18 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return pagesData.count
+        return wholeDate.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "pageCell", for: indexPath) as! PageCell
         cell.mayPage = pagesData[indexPath.item]
+        cell.items = []
+        if wholeDate[indexPath.item].tasksData.count > 0 {
+        for thisI in 0...wholeDate[indexPath.item].tasksData.count-1 {
+        cell.items.append( wholeDate[indexPath.item].tasksData[thisI].taskName )
+        }
+        }
         //cell.backgroundColor = indexPath.item % 2 == 0 ? .yellow : .black
         return cell
     }
