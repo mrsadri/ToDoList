@@ -10,6 +10,7 @@ import Alamofire
 import Foundation
 
 class TalkToServer {
+    
     var timer:Timer?
     var groupIDKeeperTemp : [String] = []
     var isReadyToReload : Bool = false {
@@ -20,6 +21,8 @@ class TalkToServer {
         }
     }
     
+    
+    
     var tokenKeeper : String = "" {
         didSet{
             //TODO: write the token to the PList evenif it is ""
@@ -29,6 +32,11 @@ class TalkToServer {
              3: Reload Table
              }*/
         }
+        willSet(Value) {
+            if Value == "" {
+                //present login page
+            }
+        }
     }
     var userData : (firstName: String, lastName: String) = ("",""){
         didSet{
@@ -37,7 +45,7 @@ class TalkToServer {
         }
     }
     var responseKeeper : (body: JSON, header: JSON) = (body: JSON(""), header: JSON(""))
-    var tableRows = [TabaleDataModel]()
+    var tableSections = [TabaleDataModel]()
     //SingleTone Pattern
     private init() {
         //TODO: Get token from Plist
@@ -147,7 +155,7 @@ class TalkToServer {
                 print(self.responseKeeper)
                 let newSectionInTable = TabaleDataModel(groupData: (groupName: self.responseKeeper.body["body"]["name"].stringValue, groupID: self.responseKeeper.body["body"]["id"].stringValue), tasksData: [])
                 
-                self.tableRows.append(newSectionInTable)
+                self.tableSections.append(newSectionInTable)
             } else {
                 //nothing
             }
@@ -183,9 +191,9 @@ class TalkToServer {
             
             if self.responseKeeper.body["message"].stringValue == "ok" {
                 print(self.responseKeeper)
-                for index in 0...(self.tableRows.count - 1){
-                    if self.tableRows[index].groupData.groupID == group_id {
-                        self.tableRows.remove(at: index)
+                for index in 0...(self.tableSections.count - 1){
+                    if self.tableSections[index].groupData.groupID == group_id {
+                        self.tableSections.remove(at: index)
                         //TODO: write self.tableRows to Plist and reload table
                     }
                 }
@@ -218,7 +226,7 @@ class TalkToServer {
                 // BUG: IF I call getTask, the JSONkeeper which is filled by groupData is affected, please pay attention to prevent this
                 
                 // 1:
-                self.tableRows = []
+                self.tableSections = []
                 
                 // 2:
                 //count the JSON parameters in body then write a for here
@@ -230,7 +238,7 @@ class TalkToServer {
                     
                     let newElementM = TabaleDataModel(groupData: groupDataM, tasksData: [])
                     
-                    self.tableRows.append(newElementM)
+                    self.tableSections.append(newElementM)
                     
                     self.groupIDKeeperTemp.append(groupDataM.groupID)
                     
@@ -252,6 +260,7 @@ class TalkToServer {
         
         
     }
+    
     @objc func getTasksQueue(){
         if groupIDKeeperTemp.count > 0 {
             self.getTask(group_id: groupIDKeeperTemp[0])
@@ -263,14 +272,13 @@ class TalkToServer {
         
     }
     
-    
     func updateGroup(groupName: String, group_id: String){ //Change Group name
         
         //As same as "DeleteGroup" you just know the name of group not its ID
         let thisUrl = "http://buzztaab.com:8081/api/updateGroup/"
         let headers: HTTPHeaders = ["authorization" :/* "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk"*/  "Bearer +\(tokenKeeper)",
             "Content-Type": "application/x-www-form-urlencoded"]
-        let bodyparameters = ["group_id": group_id ]
+        let bodyparameters = ["groupName":groupName, "group_id": group_id ]
         
         requester(url: thisUrl, headers: headers, bodyparameters: bodyparameters)
         
@@ -279,9 +287,9 @@ class TalkToServer {
             if self.responseKeeper.body["message"].stringValue == "ok" {
                 print(self.responseKeeper)
                 //count the JSON parameters in body then write a for here
-                for index in 0...(self.tableRows.count - 1){
-                    if self.tableRows[index].groupData.groupID == group_id {
-                        self.tableRows[index].groupData.groupName = groupName
+                for index in 0...(self.tableSections.count - 1){
+                    if self.tableSections[index].groupData.groupID == group_id {
+                        self.tableSections[index].groupData.groupName = groupName
                         //TODO: write self.tableRows to Plist and reload table
                     }
                 }
@@ -292,13 +300,10 @@ class TalkToServer {
             }
         }
         
-        
-        
-        
-        
     }
+
     
-    func createTask(group_id: String , taskName: String, taskDescription: String, executionTime : String = "fd"){
+    func createTask(group_id: String , taskName: String, taskDescription: String){
         //BUG: API, when create a task in the none exist group server does not respond in a proper way.
         
         let thisUrl = "http://buzztaab.com:8081/api/createTask/"
@@ -316,12 +321,12 @@ class TalkToServer {
             if self.responseKeeper.body["message"].stringValue == "ok" {
                 print(self.responseKeeper)
                 //count the JSON parameters in body then write a for here
-                for index in 0...(self.tableRows.count - 1){
-                    if self.tableRows[index].groupData.groupID == group_id {
+                for index in 0...(self.tableSections.count - 1){
+                    if self.tableSections[index].groupData.groupID == group_id {
                         
                         let newTask = (taskName: taskName, taskID: self.responseKeeper.body["body"]["id"].stringValue, taskDescription: taskDescription, doneStatus: false)
                         
-                        self.tableRows[index].tasksData.append(newTask)
+                        self.tableSections[index].tasksData.append(newTask)
                         //TODO: write self.tableRows to Plist and reload table
                     }
                 }
@@ -347,11 +352,11 @@ class TalkToServer {
             if self.responseKeeper.body["message"].stringValue == "ok" {
                 print(self.responseKeeper)
                 //count the JSON parameters in body then write a for here
-                for gIndex in 0...(self.tableRows.count - 1){
-                    if self.tableRows[gIndex].tasksData.count != 0 {
-                        for tIndex in 0...(self.tableRows[gIndex].tasksData.count - 1) {
-                            if self.tableRows[gIndex].tasksData[tIndex].taskID == task_id {
-                                self.tableRows[gIndex].tasksData.remove(at: tIndex)
+                for gIndex in 0...(self.tableSections.count - 1){
+                    if self.tableSections[gIndex].tasksData.count != 0 {
+                        for tIndex in 0...(self.tableSections[gIndex].tasksData.count - 1) {
+                            if self.tableSections[gIndex].tasksData[tIndex].taskID == task_id {
+                                self.tableSections[gIndex].tasksData.remove(at: tIndex)
                             }
                         }
                     }
@@ -366,6 +371,7 @@ class TalkToServer {
     }
     
     func getTask(group_id : String) {
+        
         let thisUrl = "http://buzztaab.com:8081/api/getTask/"
         let headers: HTTPHeaders = ["authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk", //  "Bearer +\(tokenKeeper)",
             "Content-Type": "application/x-www-form-urlencoded"]
@@ -388,9 +394,9 @@ class TalkToServer {
                 //count the JSON parameters in body then write a for here
                 if self.responseKeeper.body["body"].count != 0 {
                     //1
-                    for indexM in 0...self.tableRows.count-1 {
-                        if self.tableRows[indexM].groupData.groupID == group_id {
-                            self.tableRows[indexM].tasksData = []
+                    for indexM in 0...self.tableSections.count-1 {
+                        if self.tableSections[indexM].groupData.groupID == group_id {
+                            self.tableSections[indexM].tasksData = []
                         }
                     }
                     for index in 0...self.responseKeeper.body["body"].count-1 {
@@ -399,10 +405,10 @@ class TalkToServer {
                                          taskDescription:  self.responseKeeper.body["body"][index]["taskDescription"].stringValue,
                                          doneStatus: false)
                         //2: Find the section(ie Group) by groupID
-                        for indexM in 0...self.tableRows.count-1 {
-                            if self.tableRows[indexM].groupData.groupID == group_id {
+                        for indexM in 0...self.tableSections.count-1 {
+                            if self.tableSections[indexM].groupData.groupID == group_id {
                                 //3
-                                self.tableRows[indexM].tasksData.append(taskDataM)
+                                self.tableSections[indexM].tasksData.append(taskDataM)
                             }
                         }
                     }
@@ -434,19 +440,19 @@ class TalkToServer {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1){
             //find the group:
-            if self.tableRows.count > 0 {
-                for i in 0...self.tableRows.count-1 {
-                    if self.responseKeeper.body["body"]["groupId"].stringValue == self.tableRows[i].groupData.groupID {
+            if self.tableSections.count > 0 {
+                for i in 0...self.tableSections.count-1 {
+                    if self.responseKeeper.body["body"]["groupId"].stringValue == self.tableSections[i].groupData.groupID {
                         
                         //find the task
-                        if self.tableRows[i].tasksData.count > 0 {
-                            for j in 0...self.tableRows[i].tasksData.count-1 {
-                                if self.responseKeeper.body["body"]["id"].stringValue == self.tableRows[i].tasksData[j].taskID {
+                        if self.tableSections[i].tasksData.count > 0 {
+                            for j in 0...self.tableSections[i].tasksData.count-1 {
+                                if self.responseKeeper.body["body"]["id"].stringValue == self.tableSections[i].tasksData[j].taskID {
                                     
                                     //change the task
                                     let newTask = (taskName: taskName, taskID: task_id, taskDescription: taskDescription, doneStatus: false)
                                     //BUG: doneState cannot be changed on server side
-                                    self.tableRows[i].tasksData[j] = newTask
+                                    self.tableSections[i].tasksData[j] = newTask
                                     
                                 }
                             }
@@ -486,13 +492,13 @@ class TalkToServer {
     }
     
     func dataModelPrinter () {
-        for i in 0...tableRows.count-1 {
+        for i in 0...tableSections.count-1 {
             print("---------------------------------")
-            print("Group ID: \(tableRows[i].groupData.groupID)\tGroup name: \(tableRows[i].groupData.groupName)")
+            print("Group ID: \(tableSections[i].groupData.groupID)\tGroup name: \(tableSections[i].groupData.groupName)")
             print(".................................")
-            if tableRows[i].tasksData.count > 0 {
-                for j in 0...tableRows[i].tasksData.count-1 {
-                    print("Task Name: \(tableRows[i].tasksData[j].taskName)")
+            if tableSections[i].tasksData.count > 0 {
+                for j in 0...tableSections[i].tasksData.count-1 {
+                    print("Task Name: \(tableSections[i].tasksData[j].taskName)")
                 }
             }
         }
@@ -505,4 +511,7 @@ class TalkToServer {
 //- TODO: if JSON message == "ok" { successFlag = true } :Done in other way
 //- TODO: Encapsulate this Class (ie these methodes: getGroup, createGroup, ...) with reloadTable Data, then move requester method to TalkToServer Class
 //- TODO: reload tabelData in success clouser in all methodes
+//- TODO: Impliment Base URL
+//- Challenge: Update Part of a task
+//- Challenge: find task position by its title name
 

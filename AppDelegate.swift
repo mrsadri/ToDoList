@@ -18,6 +18,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
         // Override point for customization after application launch.
+        
+        window = UIWindow()
+        window?.makeKeyAndVisible()
+        
+        //        let randomViewController = UIViewController()
+        //        randomViewController.view.backgroundColor = .blue
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        let swipingController = SwipController(collectionViewLayout: layout)
+        window?.rootViewController = swipingController
+        
         return true
     }
 

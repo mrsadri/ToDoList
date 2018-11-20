@@ -14,6 +14,7 @@ import UIKit
 var dataFilePathGlobalVarray : URL? = nil
 class TableViewController: UITableViewController {
     
+    let userdefa = UserDefaults.standard
     
     @IBOutlet var tblView: UITableView!
     @IBAction func addButtonAction(_ sender: UIBarButtonItem) {
@@ -75,7 +76,6 @@ class TableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         //----temp
-
         //----
         
         let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
