@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //        randomViewController.view.backgroundColor = .blue
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        let swipingController = SwipController(collectionViewLayout: layout)
+        let swipingController = HomeScreen()//(collectionViewLayout: layout)
         window?.rootViewController = swipingController
         
         return true

@@ -11,7 +11,7 @@ import UIKit
 
 class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegate {
     
-    let items = ["One", "Two", "Three", "Four", "Five" ,"Six", "Seven", "Eight", "Nine", "Ten"]
+    var items : [String] = [""]
 
     var mayPage : PageDataModel? {
         didSet{
@@ -25,7 +25,6 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
             descriptionTextView.attributedText = attributedText
             descriptionTextView.textAlignment = .center
             
-            items
             
             //here is not proper place for these jangoolak baazies so I comment these
 //            let red   = Float((arc4random() % 256)) / 255.0
