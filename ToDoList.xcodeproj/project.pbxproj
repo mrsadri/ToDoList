@@ -12,6 +12,7 @@
 		CE18B8FC214EE6BA00C81E41 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE18B8FB214EE6BA00C81E41 /* TableViewController.swift */; };
 		CE75CE6321751A2E007657C0 /* PLDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE75CE6221751A2E007657C0 /* PLDBManager.swift */; };
 		CE91D6A22157D13100DE16B4 /* CelliTem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE91D6A12157D13100DE16B4 /* CelliTem.swift */; };
+		CEBCDD4B21A71C0500E3A821 /* TalkToServerGetTasksInAsyncMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBCDD4A21A71C0400E3A821 /* TalkToServerGetTasksInAsyncMode.swift */; };
 		CEC5D363214EE16A0046FA92 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC5D362214EE16A0046FA92 /* AppDelegate.swift */; };
 		CEC5D368214EE16A0046FA92 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEC5D366214EE16A0046FA92 /* Main.storyboard */; };
 		CEC5D36A214EE16B0046FA92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEC5D369214EE16B0046FA92 /* Assets.xcassets */; };
@@ -36,6 +37,7 @@
 		CE18B8FB214EE6BA00C81E41 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		CE75CE6221751A2E007657C0 /* PLDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PLDBManager.swift; sourceTree = "<group>"; };
 		CE91D6A12157D13100DE16B4 /* CelliTem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelliTem.swift; sourceTree = "<group>"; };
+		CEBCDD4A21A71C0400E3A821 /* TalkToServerGetTasksInAsyncMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkToServerGetTasksInAsyncMode.swift; sourceTree = "<group>"; };
 		CEC5D35F214EE16A0046FA92 /* ToDoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEC5D362214EE16A0046FA92 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CEC5D367214EE16A0046FA92 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				CEE11AA02199552C001D6941 /* TalkToServer.swift */,
+				CEBCDD4A21A71C0400E3A821 /* TalkToServerGetTasksInAsyncMode.swift */,
 			);
 			path = Connection;
 			sourceTree = "<group>";
@@ -292,6 +295,7 @@
 				CED1C83621A4AECA001CA7BB /* HomeScreen.swift in Sources */,
 				CE75CE6321751A2E007657C0 /* PLDBManager.swift in Sources */,
 				CED1C82E21A4735A001CA7BB /* SwipController.swift in Sources */,
+				CEBCDD4B21A71C0500E3A821 /* TalkToServerGetTasksInAsyncMode.swift in Sources */,
 				CEE11AA321996ECC001D6941 /* TableDataModel.swift in Sources */,
 				CEE11AA12199552C001D6941 /* TalkToServer.swift in Sources */,
 				CED1C82A21A47311001CA7BB /* PageDataModel.swift in Sources */,

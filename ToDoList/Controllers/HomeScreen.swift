@@ -13,8 +13,12 @@ import UIKit
 
 class HomeScreen : UIViewController, toAccessHomeFunctions {
     
-    
-    //static let sharedObject = HomeScreen()
+    let timerLabelForLoading : UILabel = {
+        let thisLabel = UILabel()
+        thisLabel.backgroundColor = .white
+        thisLabel.translatesAutoresizingMaskIntoConstraints = false
+        return thisLabel
+    }()
     
     func loadTheApplication(){
         print(wholeDate)
@@ -31,9 +35,23 @@ class HomeScreen : UIViewController, toAccessHomeFunctions {
 
     }
     
+    var timer : Timer?
+    func setTimerFirstValue(input: String){
+        timerLabelForLoading.text = String(input)
+        self.timer = Timer.scheduledTimer(timeInterval:  1, target: self, selector: #selector(self.startLoading), userInfo: nil, repeats: true)
+    }
+    
+    @objc func startLoading() {
+        timerLabelForLoading.text = String(Int(timerLabelForLoading.text!)! - 1)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .magenta
+        
+        self.view.addSubview(timerLabelForLoading)
+        
+        timerLabelForLoading.frame = CGRect(x: 50, y: 50, width: 100 , height: 100)
         
         TalkToServer.sharedObject.delegetionForThisClass = self
         

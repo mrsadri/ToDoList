@@ -54,18 +54,25 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
+        
+        
         let more = UITableViewRowAction(style: .normal, title: "Remove") { action, index in
-            print("more button tapped")
+            print((self.itemsToBuildThisTables?.tasksData[editActionsForRowAt.row].taskID)!)
+            TalkToServer.sharedObject.deleteTask(task_id: (self.itemsToBuildThisTables?.tasksData[editActionsForRowAt.row].taskID)! )
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4){
+                print("try to reload the table+++++")
+                self.firstTable.reloadData()}
+            print("Remove button tapped")
         }
         more.backgroundColor = .red
         
         let favorite = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
-            print("favorite button tapped")
+            print("Edit button tapped")
         }
         favorite.backgroundColor = .lightGray
         
         let share = UITableViewRowAction(style: .normal, title: "Done") { action, index in
-            print("share button tapped")
+            print("Done button tapped")
         }
         share.backgroundColor = .green
         
