@@ -21,27 +21,32 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         coordinator.animate(alongsideTransition: { (_) in
-            
+              
                 self.collectionViewLayout.invalidateLayout()
                 let thisIndexPath = IndexPath(item: self.pageController.currentPage, section: 0)
-                self.collectionView?.scrollToItem(at: thisIndexPath, at: .centeredHorizontally, animated: true)
-
+                self.collectionView?.scrollToItem(at: thisIndexPath, at: .centeredVertically, animated: true)
             
         }) { (_) in
             //
         }
+        
+        
     }
     
     
-    let pagesData : [PageDataModel] = [
-        PageDataModel(imageName: "bear_first", headerText: "Join use today in our fun and games!", bodyText: "Are you ready for loads and loads of fun? Don't wait any longer! We hope to see you in our stores soon."),
-        PageDataModel(imageName: "heart_second", headerText: "Subscribe and get coupons on our daily events", bodyText: "Get notified of the savings immediately when we announce them on our website. Make sure to also give us any feedback you have."),
-        PageDataModel(imageName: "leaf_third", headerText: "VIP members special services", bodyText: "")
-    ]
+    //let pagesData : [PageDataModel] = [
+    //        PageDataModel(imageName: "bear_first", headerText: "Join use today in our fun and games!", bodyText: "Are you ready for loads and loads of fun? Don't wait any longer! We hope to see you in our stores soon."),
+    //        PageDataModel(imageName: "heart_second", headerText: "Subscribe and get coupons on our daily events", bodyText: "Get notified of the savings immediately when we announce them on our website. Make sure to also give us any feedback you have."),
+    //        PageDataModel(imageName: "leaf_third", headerText: "VIP members special services", bodyText: "")
+    //    ]
     
     func reloadData() {
         //collectionView.reloadData()
     }
+    
+//    func printPointee() {
+//        print(self.targetContentOffset.pointee.y)
+//    }
     
     private let previouaseButton : UIButton = {
         let button = UIButton(type: .system)
@@ -58,20 +63,14 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
             let prevIndexPage = pageController.currentPage - 1
             let thisIndexPath = IndexPath(item: prevIndexPage, section: 0)
             pageController.currentPage = prevIndexPage
-            collectionView?.scrollToItem(at: thisIndexPath, at: .centeredHorizontally, animated: true)
+            collectionView?.scrollToItem(at: thisIndexPath, at: .centeredVertically, animated: true)
             changeButtonState(input: nextButton, toWhat: .enable)
-//            nextButton.isEnabled = true
-//            nextButton.setTitleColor(.myPinkColor, for: .normal)
         }
         if pageController.currentPage == 0 {
             changeButtonState(input: previouaseButton, toWhat: .disable)
-//            previouaseButton.isEnabled = false
-//            previouaseButton.setTitleColor(.gray, for: .normal)
             
         } else {
             changeButtonState(input: previouaseButton, toWhat: .enable)
-//            previouaseButton.isEnabled = true
-//            previouaseButton.setTitleColor(.myPinkColor, for: .normal)
         }
     }
     
@@ -90,24 +89,13 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
             let nextIndexPage = pageController.currentPage + 1
             let thisIndexPath = IndexPath(item: nextIndexPage, section: 0)
             pageController.currentPage = nextIndexPage
-            collectionView?.scrollToItem(at: thisIndexPath, at: .centeredHorizontally, animated: true)
+            collectionView?.scrollToItem(at: thisIndexPath, at: .centeredVertically, animated: true)
             changeButtonState(input: previouaseButton, toWhat: .enable)
-//            let nextPage = NewLoginPage()
-//            nextPage.view.backgroundColor = .black
-//            self.present(nextPage, animated: true) {
-//                //nothing
-//            }
         }
         if pageController.currentPage + 1 == pageController.numberOfPages {
             changeButtonState(input: nextButton, toWhat: .disable)
-//            nextButton.isEnabled = false
-//            nextButton.setTitleColor(.gray, for: .normal)
-
         } else {
             changeButtonState(input: nextButton, toWhat: .enable)
-//            nextButton.isEnabled = true
-//            nextButton.setTitleColor(.myPinkColor, for: .normal)
-
         }
     }
     
@@ -143,13 +131,11 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
         previousPageNumber = pageController.currentPage
     }
     override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        let pageIndex = (targetContentOffset.pointee.x) / view.frame.width
+        // print("here: \(pageIndex)")
+        let pageIndex = (targetContentOffset.pointee.y) / view.frame.height
         pageController.currentPage = Int(pageIndex)
         
-        if pageController.currentPage == previousPageNumber {
-            print("-----------")
-            //attemping to fix iPhone X Bug on first and last page
-        }
+        if pageController.currentPage == previousPageNumber {}
         
         if pageController.currentPage == 0 {
             changeButtonState(input: previouaseButton, toWhat: .disable)
@@ -171,29 +157,31 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //TalkToServer.sharedObject.getGroup()
+        self.collectionView.contentInset = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)//(-20, 0, 0, 0)
 
+        //TalkToServer.sharedObject.getGroup()
+        
         //temp
         DispatchQueue.main.asyncAfter(deadline: .now() + 2){
-//            if TalkToServer.sharedObject.tokenKeeper == "" {
-//                let loginPage = self.storyboard?.instantiateViewController(withIdentifier: "loginPageId") as! LoginPageVC
-//                self.present(loginPage, animated: true, completion: nil)
-//            } else {
-//                print("Hello Back \(TalkToServer.sharedObject.userData.firstName)")
-//            }
+            //            if TalkToServer.sharedObject.tokenKeeper == "" {
+            //                let loginPage = self.storyboard?.instantiateViewController(withIdentifier: "loginPageId") as! LoginPageVC
+            //                self.present(loginPage, animated: true, completion: nil)
+            //            } else {
+            //                print("Hello Back \(TalkToServer.sharedObject.userData.firstName)")
+            //            }
             //TalkToServer.sharedObject.updateTask(task_id: "37", group_id: "24", taskName: "new Name for this Task", taskDescription: "Description is Updated")
             
             //    TalkToServer.sharedObject.register(firstName: "Mohsen", lastName: "Ebrahimi", password: "ali123", email: "mohsen@gmail.com")
             //        TalkToServer.sharedObject.createGroup(groupName: "Akbar!")
         }
         //
-
+        
         setupButtonControls()
         collectionView?.backgroundColor = .white
         collectionView?.register(PageCell.self, forCellWithReuseIdentifier: "pageCell")
         changeButtonState(input: previouaseButton, toWhat: .disable)
         collectionView?.isPagingEnabled = true
-//        collectionView.
+        //        collectionView.
         collectionView?.contentOffset = .zero
     }
     
@@ -205,7 +193,7 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     func changeButtonState (input: UIButton, toWhat: buttonState ) {
         
         let thisButton = input
-
+        
         if toWhat == .disable {
             thisButton.isEnabled = false
             thisButton.setTitleColor(.gray, for: .normal)
@@ -226,14 +214,8 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "pageCell", for: indexPath) as! PageCell
-        cell.mayPage = pagesData[indexPath.item]
-        cell.items = []
-        if wholeDate[indexPath.item].tasksData.count > 0 {
-        for thisI in 0...wholeDate[indexPath.item].tasksData.count-1 {
-        cell.items.append( wholeDate[indexPath.item].tasksData[thisI].taskName )
-        }
-        }
-        //cell.backgroundColor = indexPath.item % 2 == 0 ? .yellow : .black
+        cell.itemsToBuildThisTables = wholeDate[indexPath.item]
+        
         return cell
     }
     

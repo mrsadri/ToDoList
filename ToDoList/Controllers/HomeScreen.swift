@@ -20,7 +20,9 @@ class HomeScreen : UIViewController, toAccessHomeFunctions {
         print(wholeDate)
         print("try to load the application")
         let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
+        layout.scrollDirection = .vertical
+        layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 0
         let swipingController = SwipController(collectionViewLayout: layout)
         //swipingController.view.backgroundColor = .black
         self.present(swipingController, animated: true) {
@@ -37,7 +39,8 @@ class HomeScreen : UIViewController, toAccessHomeFunctions {
         
         TalkToServer.sharedObject.getGroup()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 60){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+            //self.loadTheApplication()
         }
         
     }
