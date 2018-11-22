@@ -8,6 +8,7 @@
 import SwiftyJSON
 import Alamofire
 import Foundation
+
 var wholeDate = [
     TabaleDataModel(groupData : (groupName: "Group", groupID: "") , tasksData: [(taskName: "String", taskID: "1", taskDescription: "String", doneStatus: true )] ),
     TabaleDataModel(groupData : (groupName: "Group", groupID: "") , tasksData: [(taskName: "String", taskID: "1", taskDescription: "String", doneStatus: true )] )
@@ -15,6 +16,7 @@ var wholeDate = [
 
 protocol toAccessHomeFunctions {
     func loadTheApplication()
+    func setTimerFirstValue(input: String)
 }
 
 class TalkToServer {
@@ -32,8 +34,8 @@ class TalkToServer {
                 print("data is fetched fully")
                 self.delegetionForThisClass.loadTheApplication()
                 //HomeScreen.sharedObject.loadTheApplication()
-
-           }
+                
+            }
         }
     }
     
@@ -99,7 +101,7 @@ class TalkToServer {
         //                print(jsonKeeperBody)
         //                print(jsonKeeperHeader)
         //                print("-++-------")
-        //                self.tokenKeeper = jsonKeeperHeader["token"].stringValue
+        //                        self.tokenKeeper = jsonKeeperHeader["token"].stringValue
         //                //set name and lastName
         //                self.userData.firstName = jsonKeeperBody  ["body"]["first_name"].stringValue
         //                self.userData.lastName  = jsonKeeperHeader["body"]["last_name" ].stringValue
@@ -193,7 +195,7 @@ class TalkToServer {
     
     func deleteGroup(group_id: String)  {
         
-        //Since you just know the name of grups not their ID, You may need name of group and call getGroupe and find the ID of the Group then call this func byt the ID! // another way solved this
+        //Since you just know the name of grups not their ID, You may need name of group and call get_Groupe and find the ID of the Group then call this func byt the ID! // another way solved this
         
         let thisUrl = "http://buzztaab.com:8081/api/deleteGroup/"
         let headers: HTTPHeaders = ["authorization" :/* "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk"*/  "Bearer +\(tokenKeeper)",
@@ -237,9 +239,9 @@ class TalkToServer {
                 /*BUG: it will faced out of range error, the solution:
                  step 1: empty the array at first (if requst is success)
                  step 2: apend groupData 1by1 to a temp array
-                 step 3: call getTask by groupID to fill taskData in the array
+                 step 3: call get_Task by groupID to fill taskData in the array
                  step 4 : reload the table*/
-                // BUG: IF I call getTask, the JSONkeeper which is filled by groupData is affected, please pay attention to prevent this
+                // BUG: IF I call get_Task, the JSONkeeper which is filled by groupData is affected, please pay attention to prevent this
                 
                 // 1:
                 self.tableSections = []
@@ -247,27 +249,26 @@ class TalkToServer {
                 // 2:
                 //count the JSON parameters in body then write a for here
                 if self.responseKeeper.body["body"].count > 0 {
-                for index in 0...self.responseKeeper.body["body"].count-1 {
-                    
-                    let groupDataM : (groupName: String, groupID: String) =
-                        (groupName: self.responseKeeper.body["body"][index]["name"].stringValue,
-                         groupID:   self.responseKeeper.body["body"][index]["id"  ].stringValue)
-                    
-                    let newElementM = TabaleDataModel(groupData: groupDataM, tasksData: [])
-                    
-                    self.tableSections.append(newElementM)
-                    
-                    self.groupIDKeeperTemp.append(groupDataM.groupID)
-                    
-                    
-                    //                    self.tableRows[index].groupData.groupID   = self.responseKeeper.body["body"][index]["id"  ].stringValue
-                    //                    self.tableRows[index].groupData.groupName = self.responseKeeper.body["body"][index]["name"].stringValue
-                }
+                    for index in 0...self.responseKeeper.body["body"].count-1 {
+                        
+                        let groupDataM : (groupName: String, groupID: String) =
+                            (groupName: self.responseKeeper.body["body"][index]["name"].stringValue,
+                             groupID:   self.responseKeeper.body["body"][index]["id"  ].stringValue)
+                        
+                        let newElementM = TabaleDataModel(groupData: groupDataM, tasksData: [])
+                        
+                        self.tableSections.append(newElementM)
+                        
+                        self.groupIDKeeperTemp.append(groupDataM.groupID)
+
+                        //                    self.tableRows[index].groupData.groupID   = self.responseKeeper.body["body"][index]["id"  ].stringValue
+                        //                    self.tableRows[index].groupData.groupName = self.responseKeeper.body["body"][index]["name"].stringValue
+                    }
                 }
                 self.timer = Timer.scheduledTimer(timeInterval:  2, target: self, selector: #selector(self.getTasksQueue), userInfo: nil, repeats: true)
                 
                 //                for groupIndex in 0...(self.tableRows.count - 1) {
-                //                    self.getTask(group_id: self.tableRows[groupIndex].groupData.groupID)
+                //                    self.get_Task(group_id: self.tableRows[groupIndex].groupData.groupID)
                 //                }
                 
             } else {
@@ -276,7 +277,11 @@ class TalkToServer {
             }
         }
         
-        
+        //here tell to Home Screen How much does it take
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1){
+            let howManyGroups : String = String(self.tableSections.count * 2 + 2)
+        self.delegetionForThisClass.setTimerFirstValue(input: howManyGroups)
+        }
     }
     
     @objc func getTasksQueue(){
@@ -320,7 +325,7 @@ class TalkToServer {
         }
         
     }
-
+    
     
     func createTask(group_id: String , taskName: String, taskDescription: String){
         //BUG: API, when create a task in the none exist group server does not respond in a proper way.
@@ -359,23 +364,28 @@ class TalkToServer {
     
     func deleteTask(task_id: String) {
         let thisUrl = "http://buzztaab.com:8081/api/deleteTask/"
-        let headers: HTTPHeaders = ["authorization" :/* "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk"*/  "Bearer +\(tokenKeeper)",
+        let headers: HTTPHeaders = ["authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk", //  "Bearer +\(tokenKeeper)",
             "Content-Type": "application/x-www-form-urlencoded"]
         let bodyparameters = ["task_id": task_id ]
         
+        
         requester(url: thisUrl, headers: headers, bodyparameters: bodyparameters)
         
-        
+        var isDeletedM : Bool = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 2){
             // BUG: server always rspond "OK"
             if self.responseKeeper.body["message"].stringValue == "ok" {
                 print(self.responseKeeper)
                 //count the JSON parameters in body then write a for here
+                
                 for gIndex in 0...(self.tableSections.count - 1){
                     if self.tableSections[gIndex].tasksData.count != 0 {
                         for tIndex in 0...(self.tableSections[gIndex].tasksData.count - 1) {
-                            if self.tableSections[gIndex].tasksData[tIndex].taskID == task_id {
+                            if (self.tableSections[gIndex].tasksData[tIndex].taskID == task_id && !isDeletedM){
                                 self.tableSections[gIndex].tasksData.remove(at: tIndex)
+                                wholeDate = self.tableSections
+                                //self.isReadyToReload = true
+                                isDeletedM = true
                             }
                         }
                     }
@@ -472,7 +482,6 @@ class TalkToServer {
                                     let newTask = (taskName: taskName, taskID: task_id, taskDescription: taskDescription, doneStatus: false)
                                     //BUG: doneState cannot be changed on server side
                                     self.tableSections[i].tasksData[j] = newTask
-                                    
                                 }
                             }
                         }
@@ -480,13 +489,12 @@ class TalkToServer {
                 }
             }
         }
-        
     }
     
     //this func will fetch all data at first step from server
-    func fetchAll() { //getGroup is doing the same action, so I skip this one
+    func fetchAll() { //get_Group is doing the same action, so I skip this one
         /*
-         1: call getGroup
+         1: call get_Group
          2: by every groupID call get task
          3: the self.tableRows will fill automaticaly
          4: write data to the PList
@@ -526,9 +534,9 @@ class TalkToServer {
 }
 //- Note: SingleTone pattern is not suitable for this case and I have to use delegation pattern
 //- TODO: Define a requester func to call alamofire with header, body, and url and return bodyJSON and HeaderJSON :Done
-//- TODO: if token == "" ban all this funcs: getGroup, createGroup, ...
+//- TODO: if token == "" ban all this funcs: get_Group, createGroup, ...
 //- TODO: if JSON message == "ok" { successFlag = true } :Done in other way
-//- TODO: Encapsulate this Class (ie these methodes: getGroup, createGroup, ...) with reloadTable Data, then move requester method to TalkToServer Class
+//- TODO: Encapsulate this Class (ie these methodes: get_Group, createGroup, ...) with reloadTable Data, then move requester method to TalkToServer Class
 //- TODO: reload tabelData in success clouser in all methodes
 //- TODO: Impliment Base URL
 //- Challenge: Update Part of a task
