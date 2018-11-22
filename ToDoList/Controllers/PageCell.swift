@@ -11,68 +11,92 @@ import UIKit
 
 class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegate {
     
-    var items : [String] = [""]
-
-    var mayPage : PageDataModel? {
+    //var items : [String] = [""]
+    var itemsToBuildThisTables : TabaleDataModel?{
         didSet{
-            guard let unwrappedPage = mayPage else { return }
+            guard let unrappedData = itemsToBuildThisTables else { return }
+        
+            let attributedText = NSMutableAttributedString(string: "Group:", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17), NSAttributedString.Key.foregroundColor: UIColor.gray])
+        
+            attributedText.append(NSAttributedString(string: "\n\t\t" + unrappedData.groupData.groupName, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 20)]))
             
-            bearImageView.image = UIImage(named: unwrappedPage.imageName)
-            
-            let attributedText = NSMutableAttributedString(string: unwrappedPage.headerText, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 20)])
-            
-            attributedText.append(NSAttributedString(string: "\n\n" + unwrappedPage.bodyText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17), NSAttributedString.Key.foregroundColor: UIColor.gray]))
             descriptionTextView.attributedText = attributedText
-            descriptionTextView.textAlignment = .center
             
-            
-            //here is not proper place for these jangoolak baazies so I comment these
-//            let red   = Float((arc4random() % 256)) / 255.0
-//            let green = Float((arc4random() % 256)) / 255.0
-//            let blue  = Float((arc4random() % 256)) / 255.0
-//            let alpha = Float(1.0)
-//
-//            descriptionTextView.backgroundColor = UIColor(red: CGFloat(red), green: CGFloat(green), blue: CGFloat(blue), alpha: CGFloat(alpha))
-//            bearImageView.backgroundColor = UIColor.yellow
-//
-//            UIView.animate(withDuration: 10.0, delay: 0.0, animations: {
-//                self.bearImageView.backgroundColor = UIColor(red: CGFloat(red), green: CGFloat(green), blue: CGFloat(blue), alpha: CGFloat(alpha)) //(colorLiteralRed: red, green: green, blue: blue, alpha: alpha)
-//            }, completion:nil)
-
+            firstTable.reloadData()
+        
         }
     }
     
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return items.count
+        return (itemsToBuildThisTables?.tasksData.count)!
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = firstTable.dequeueReusableCell(withIdentifier: "cellID")
-        cell?.textLabel?.text = items[indexPath.row]
-        cell?.textLabel?.textAlignment = .left
-        
-        let iconImageView = UIImageView()
-        iconImageView.image = UIImage(named: "bear_first")
-        cell?.addSubview(iconImageView)
-        
-        iconImageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        iconImageView.topAnchor.constraint(equalTo: (cell?.topAnchor)!, constant: 20).isActive = true
-        iconImageView.rightAnchor.constraint(equalTo: (cell?.rightAnchor)!, constant: -40).isActive = true
-        iconImageView.bottomAnchor.constraint(equalTo: (cell?.bottomAnchor)!).isActive = true
-        iconImageView.widthAnchor.constraint(equalTo: cell!.heightAnchor, constant: -20).isActive = true
-        
-        cell!.backgroundColor = UIColor.orange
-        return cell!
+        let cell = firstTable.dequeueReusableCell(withIdentifier: "cellID") as! TableCell
+        cell.cellTextLabel.text = "   " + (itemsToBuildThisTables?.tasksData[indexPath.row].taskName)!
+//        cell?.textLabel?.text = itemsToBuildThisTables?.tasksData[indexPath.row].taskName
+//        cell?.textLabel?.textAlignment = .left
+//
+//        let iconImageView = UIImageView()
+//        iconImageView.image = UIImage(named: "bear_first")
+//        cell?.addSubview(iconImageView)
+//
+//        iconImageView.translatesAutoresizingMaskIntoConstraints = false
+//
+//        iconImageView.topAnchor.constraint(equalTo: (cell?.topAnchor)!, constant: 20).isActive = true
+//        iconImageView.rightAnchor.constraint(equalTo: (cell?.rightAnchor)!, constant: -40).isActive = true
+//        iconImageView.bottomAnchor.constraint(equalTo: (cell?.bottomAnchor)!).isActive = true
+//        iconImageView.widthAnchor.constraint(equalTo: cell!.heightAnchor, constant: -20).isActive = true
+//
+        //cell.backgroundColor = UIColor.orange
+        return cell
     }
     
-    let bearImageView : UIImageView = {
-        let imageView = UIImageView(image: #imageLiteral(resourceName: "bear_first"))
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
+    func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
+        let more = UITableViewRowAction(style: .normal, title: "Remove") { action, index in
+            print("more button tapped")
+        }
+        more.backgroundColor = .red
+        
+        let favorite = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
+            print("favorite button tapped")
+        }
+        favorite.backgroundColor = .lightGray
+        
+        let share = UITableViewRowAction(style: .normal, title: "Done") { action, index in
+            print("share button tapped")
+        }
+        share.backgroundColor = .green
+        
+        return [share, favorite, more]
+    }
+    
+    //Also implement this: (You can make it conditional, but here everything is editable)
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print((itemsToBuildThisTables?.tasksData[indexPath.row].taskDescription)! )
+        firstTable.action
+        firstTable.deselectRow(at: indexPath, animated: true)
+    }
+    
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = UIColor.orange
+        cell.selectedBackgroundView = backgroundView
+    }
+    
+//    let bearImageView : UIImageView = {
+//        let imageView = UIImageView(image: #imageLiteral(resourceName: "bear_first"))
+//        imageView.contentMode = .scaleAspectFit
+//        imageView.translatesAutoresizingMaskIntoConstraints = false
+//        return imageView
+//    }()
     
     let descriptionTextView: UITextView = {
         
@@ -108,7 +132,9 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
         firstTable.dataSource = self as UITableViewDataSource
         firstTable.delegate = self as UITableViewDelegate
         
-        firstTable.register(UITableViewCell.self, forCellReuseIdentifier: "cellID")
+        firstTable.register(TableCell.self, forCellReuseIdentifier: "cellID")
+        
+        firstTable.allowsSelection = true
         
         setupLayout()
         setupTableLayout()
@@ -135,22 +161,23 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
         
         topImageContainerView.backgroundColor = .white
 
-        topImageContainerView.addSubview(bearImageView)
+        //topImageContainerView.addSubview(bearImageView)
 
-        bearImageView.centerXAnchor.constraint(equalTo: topImageContainerView.centerXAnchor                 ).isActive = true
-        bearImageView.centerYAnchor.constraint(equalTo: topImageContainerView.centerYAnchor                 ).isActive = true
-        bearImageView.heightAnchor .constraint(equalTo: topImageContainerView.heightAnchor, multiplier: 0.9 ).isActive = true
-        bearImageView.widthAnchor  .constraint(equalTo: topImageContainerView.widthAnchor , multiplier: 0.8 ).isActive = true
+//        bearImageView.centerXAnchor.constraint(equalTo: topImageContainerView.centerXAnchor                 ).isActive = true
+//        bearImageView.centerYAnchor.constraint(equalTo: topImageContainerView.centerYAnchor                 ).isActive = true
+//        bearImageView.heightAnchor .constraint(equalTo: topImageContainerView.heightAnchor, multiplier: 0.9 ).isActive = true
+//        bearImageView.widthAnchor  .constraint(equalTo: topImageContainerView.widthAnchor , multiplier: 0.8 ).isActive = true
         //temp
         //bearImageView.backgroundColor = .red
 
         self.addSubview(descriptionTextView)
         
-        descriptionTextView.topAnchor     .constraint(equalTo: bearImageView.bottomAnchor, constant: self.bounds.height / 15 ).isActive = true
+        descriptionTextView.topAnchor     .constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: self.bounds.height / 20 ).isActive = true
         descriptionTextView.leadingAnchor .constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor, constant:30).isActive = true
         //descriptionTextView.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         descriptionTextView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor,constant:-30).isActive = true
-        descriptionTextView.bottomAnchor  .constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -50          ).isActive = true
+        descriptionTextView.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        //descriptionTextView.bottomAnchor  .constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -50          ).isActive = true
         descriptionTextView.backgroundColor = .white
         
     }
@@ -160,17 +187,17 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
         self.addSubview(tableBackGround)
         self.addSubview(firstTable)
         
-        firstTable.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -200).isActive = true
-        firstTable.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 30).isActive = true
-        firstTable.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -30).isActive = true
-        firstTable.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -100).isActive = true
+        firstTable.topAnchor.constraint(equalTo: tableBackGround.topAnchor, constant: 40).isActive = true
+        firstTable.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 5).isActive = true
+        firstTable.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -5).isActive = true
+        firstTable.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -55).isActive = true
         
         firstTable.backgroundColor = .orange
         
-        tableBackGround.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -240).isActive = true
-        tableBackGround.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 30).isActive = true
-        tableBackGround.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -30).isActive = true
-        tableBackGround.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -100).isActive = true
+        tableBackGround.topAnchor.constraint(equalTo: descriptionTextView.bottomAnchor, constant: 5).isActive = true
+        tableBackGround.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 5).isActive = true
+        tableBackGround.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -5).isActive = true
+        tableBackGround.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -55).isActive = true
         
         UIView.animate(withDuration: 5.0, animations: {   })
         
