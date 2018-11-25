@@ -10,9 +10,11 @@
 		487F36C54A2B1A9D966A0DFE /* Pods_ToDoList.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D060A02D4D911516D7A289B2 /* Pods_ToDoList.framework */; };
 		CE03BB7A214F4BAA008DB397 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE03BB79214F4BAA008DB397 /* TableViewCell.swift */; };
 		CE18B8FC214EE6BA00C81E41 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE18B8FB214EE6BA00C81E41 /* TableViewController.swift */; };
+		CE3CA81921A9BC1F00D35FA7 /* HeaderUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3CA81821A9BC1F00D35FA7 /* HeaderUI.swift */; };
 		CE75CE6321751A2E007657C0 /* PLDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE75CE6221751A2E007657C0 /* PLDBManager.swift */; };
 		CE91D6A22157D13100DE16B4 /* CelliTem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE91D6A12157D13100DE16B4 /* CelliTem.swift */; };
 		CEBCDD4B21A71C0500E3A821 /* TalkToServerGetTasksInAsyncMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBCDD4A21A71C0400E3A821 /* TalkToServerGetTasksInAsyncMode.swift */; };
+		CEC1860521AB0EF200148091 /* AddNewTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC1860421AB0EF200148091 /* AddNewTaskView.swift */; };
 		CEC5D363214EE16A0046FA92 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC5D362214EE16A0046FA92 /* AppDelegate.swift */; };
 		CEC5D368214EE16A0046FA92 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEC5D366214EE16A0046FA92 /* Main.storyboard */; };
 		CEC5D36A214EE16B0046FA92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEC5D369214EE16B0046FA92 /* Assets.xcassets */; };
@@ -35,9 +37,11 @@
 		48928E3EEEFFBE1385D0C469 /* Pods-ToDoList.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ToDoList.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ToDoList/Pods-ToDoList.debug.xcconfig"; sourceTree = "<group>"; };
 		CE03BB79214F4BAA008DB397 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		CE18B8FB214EE6BA00C81E41 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
+		CE3CA81821A9BC1F00D35FA7 /* HeaderUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderUI.swift; sourceTree = "<group>"; };
 		CE75CE6221751A2E007657C0 /* PLDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PLDBManager.swift; sourceTree = "<group>"; };
 		CE91D6A12157D13100DE16B4 /* CelliTem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelliTem.swift; sourceTree = "<group>"; };
 		CEBCDD4A21A71C0400E3A821 /* TalkToServerGetTasksInAsyncMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkToServerGetTasksInAsyncMode.swift; sourceTree = "<group>"; };
+		CEC1860421AB0EF200148091 /* AddNewTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewTaskView.swift; sourceTree = "<group>"; };
 		CEC5D35F214EE16A0046FA92 /* ToDoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEC5D362214EE16A0046FA92 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CEC5D367214EE16A0046FA92 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -105,6 +109,7 @@
 				CED1C83521A4AECA001CA7BB /* HomeScreen.swift */,
 				CED1C83321A48A22001CA7BB /* NewLoginPage.swift */,
 				CED1C82D21A4735A001CA7BB /* SwipController.swift */,
+				CEC1860421AB0EF200148091 /* AddNewTaskView.swift */,
 				CED1C82B21A47348001CA7BB /* PageCell.swift */,
 				CED5AB8021A6843100E1C8AB /* TableCell.swift */,
 				CE03BB79214F4BAA008DB397 /* TableViewCell.swift */,
@@ -117,6 +122,7 @@
 		CE91D69F2157D05F00DE16B4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				CE3CA81821A9BC1F00D35FA7 /* HeaderUI.swift */,
 				CEC5D366214EE16A0046FA92 /* Main.storyboard */,
 			);
 			path = Views;
@@ -295,12 +301,14 @@
 				CED1C83621A4AECA001CA7BB /* HomeScreen.swift in Sources */,
 				CE75CE6321751A2E007657C0 /* PLDBManager.swift in Sources */,
 				CED1C82E21A4735A001CA7BB /* SwipController.swift in Sources */,
+				CEC1860521AB0EF200148091 /* AddNewTaskView.swift in Sources */,
 				CEBCDD4B21A71C0500E3A821 /* TalkToServerGetTasksInAsyncMode.swift in Sources */,
 				CEE11AA321996ECC001D6941 /* TableDataModel.swift in Sources */,
 				CEE11AA12199552C001D6941 /* TalkToServer.swift in Sources */,
 				CED1C82A21A47311001CA7BB /* PageDataModel.swift in Sources */,
 				CEE1C25621527580008EC374 /* CellManager.swift in Sources */,
 				CED1C82C21A47348001CA7BB /* PageCell.swift in Sources */,
+				CE3CA81921A9BC1F00D35FA7 /* HeaderUI.swift in Sources */,
 				CEC5D363214EE16A0046FA92 /* AppDelegate.swift in Sources */,
 				CE91D6A22157D13100DE16B4 /* CelliTem.swift in Sources */,
 				CE18B8FC214EE6BA00C81E41 /* TableViewController.swift in Sources */,

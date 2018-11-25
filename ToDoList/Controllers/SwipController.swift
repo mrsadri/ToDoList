@@ -14,11 +14,7 @@ extension UIColor {
 }
 
 class SwipController : UICollectionViewController, UICollectionViewDelegateFlowLayout {
-    
-    
-    static let sharedObject = SwipController.init()
-    
-    
+
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         coordinator.animate(alongsideTransition: { (_) in
               
@@ -33,20 +29,15 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
         
     }
     
-    
-    //let pagesData : [PageDataModel] = [
-    //        PageDataModel(imageName: "bear_first", headerText: "Join use today in our fun and games!", bodyText: "Are you ready for loads and loads of fun? Don't wait any longer! We hope to see you in our stores soon."),
-    //        PageDataModel(imageName: "heart_second", headerText: "Subscribe and get coupons on our daily events", bodyText: "Get notified of the savings immediately when we announce them on our website. Make sure to also give us any feedback you have."),
-    //        PageDataModel(imageName: "leaf_third", headerText: "VIP members special services", bodyText: "")
-    //    ]
-    
     func reloadData() {
         //collectionView.reloadData()
     }
     
-//    func printPointee() {
-//        print(self.targetContentOffset.pointee.y)
-//    }
+    let headerUI : UIView = {
+        let thisView = HeaderUI()
+        thisView.translatesAutoresizingMaskIntoConstraints = false
+        return thisView
+    }()
     
     private let previouaseButton : UIButton = {
         let button = UIButton(type: .system)
@@ -101,12 +92,35 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     
     private lazy var pageController : UIPageControl = {
         let pc = UIPageControl()
+        //pc.transform = pc.transform.rotated(by: .pi/2)
         pc.numberOfPages = wholeDate.count
         pc.currentPage = 0
         pc.pageIndicatorTintColor = UIColor.init(red: 249/255, green: 207/255, blue: 224/255, alpha: 1)
         pc.currentPageIndicatorTintColor = UIColor.myPinkColor
         return pc
     }()
+    
+    let buttonsBackGround : UIView = {
+        let thisView = UIView()
+        thisView.translatesAutoresizingMaskIntoConstraints = false
+        thisView.backgroundColor = .white
+        return thisView
+    }()
+    
+    private let addNewTaskButton : UIButton = {
+        let thisButton = UIButton()
+        thisButton.translatesAutoresizingMaskIntoConstraints = false
+        thisButton.backgroundColor = UIColor.myPinkColor
+        thisButton.layer.cornerRadius = 25
+        thisButton.addTarget(self, action: #selector(addNewTaskFunction), for: .touchUpInside)
+        return thisButton
+    }()
+    
+    @objc func addNewTaskFunction(){
+        print("add button")
+        self.newView.isHidden = !newView.isHidden
+        currentGroup = pageController.currentPage
+            }
     
     fileprivate func setupButtonControls() {
         
@@ -117,8 +131,25 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
         bottomControllsStackView.translatesAutoresizingMaskIntoConstraints = false
         bottomControllsStackView.distribution = .fillEqually
         
-        view.addSubview(bottomControllsStackView)
+        view.addSubview(buttonsBackGround)
+        buttonsBackGround.topAnchor.constraint(equalTo: view.bottomAnchor, constant: -55).isActive = true
+        buttonsBackGround.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        buttonsBackGround.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        buttonsBackGround.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        buttonsBackGround.layer.shadowColor = UIColor.black.cgColor
+        buttonsBackGround.layer.shadowOpacity = 0.5
+        buttonsBackGround.layer.shadowOffset = CGSize(width: 2, height: 2)
         
+        
+        view.addSubview(addNewTaskButton)
+        addNewTaskButton.bottomAnchor.constraint(equalTo: buttonsBackGround.topAnchor, constant: 5).isActive = true
+        addNewTaskButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -5).isActive = true
+        addNewTaskButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        addNewTaskButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        //buttonsBackGround.frame = CGRect(x: 0, y: view.frame.height-55, width: view.frame.width, height: 55)
+        
+        view.addSubview(bottomControllsStackView)
+
         NSLayoutConstraint.activate([
             bottomControllsStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -55),
             bottomControllsStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0),
@@ -126,10 +157,21 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
             bottomControllsStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -5)])
     }
     
+    func setupHeaderViewLayout() {
+        
+        view.addSubview(headerUI)
+        headerUI.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        headerUI.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        headerUI.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        headerUI.heightAnchor.constraint(equalToConstant: 50).isActive = true
+    }
+    
+    
     var previousPageNumber : Int?
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         previousPageNumber = pageController.currentPage
     }
+    
     override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         // print("here: \(pageIndex)")
         let pageIndex = (targetContentOffset.pointee.y) / view.frame.height
@@ -154,34 +196,38 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     }
     
     //-----------
+    let newView = AddNewTaskView()
+//    : UIView = {
+//        let thisView = UIView()
+//        thisView.translatesAutoresizingMaskIntoConstraints = false
+//        thisView.backgroundColor = .red
+//        return thisView
+//    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.collectionView.contentInset = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)//(-20, 0, 0, 0)
-
-        //TalkToServer.sharedObject.getGroup()
-        
         //temp
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
-            //            if TalkToServer.sharedObject.tokenKeeper == "" {
-            //                let loginPage = self.storyboard?.instantiateViewController(withIdentifier: "loginPageId") as! LoginPageVC
-            //                self.present(loginPage, animated: true, completion: nil)
-            //            } else {
-            //                print("Hello Back \(TalkToServer.sharedObject.userData.firstName)")
-            //            }
-            //TalkToServer.sharedObject.updateTask(task_id: "37", group_id: "24", taskName: "new Name for this Task", taskDescription: "Description is Updated")
-            
-            //    TalkToServer.sharedObject.register(firstName: "Mohsen", lastName: "Ebrahimi", password: "ali123", email: "mohsen@gmail.com")
-            //        TalkToServer.sharedObject.createGroup(groupName: "Akbar!")
-        }
+
+        view.addSubview(newView)
+        newView.translatesAutoresizingMaskIntoConstraints = false
+        newView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        newView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        newView.widthAnchor.constraint(equalToConstant: 330).isActive = true
+        newView.heightAnchor.constraint(equalToConstant: 245).isActive = true
+        newView.isHidden = true
         //
+
+        self.collectionView.contentInset = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
         
         setupButtonControls()
+        
+        setupHeaderViewLayout()
         collectionView?.backgroundColor = .white
         collectionView?.register(PageCell.self, forCellWithReuseIdentifier: "pageCell")
         changeButtonState(input: previouaseButton, toWhat: .disable)
         collectionView?.isPagingEnabled = true
-        //        collectionView.
+        
         collectionView?.contentOffset = .zero
     }
     
@@ -214,15 +260,16 @@ class SwipController : UICollectionViewController, UICollectionViewDelegateFlowL
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "pageCell", for: indexPath) as! PageCell
-        cell.itemsToBuildThisTables = wholeDate[indexPath.item]
-        
+        TalkToServer.sharedObject.accessToPageCellFromTalkToserver = cell.self
+        cell.pageIndex = indexPath.item
+        cell.firstTable.reloadData()
+        cell.backgroundColor = .none
+    
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: view.frame.height)
+        return CGSize(width: view.frame.width, height: view.frame.height )
     }
-    
-    
-    
+   
 }

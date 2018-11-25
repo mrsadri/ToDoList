@@ -9,74 +9,83 @@
 import Foundation
 import UIKit
 
-class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegate {
+protocol AccessToPageCell {
+    func resetPageIndex()
+    
+}
+
+
+class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegate, AccessToPageCell {
+    
+    
+    func resetPageIndex(){
+        pageIndex = currentGroup
+    }
+    var pageIndex : Int = 0 {
+        didSet{
+            itemsToBuildThisTables = wholeDate[pageIndex]
+            print("PageNo. \(pageIndex)")
+            //TalkToServer.sharedObject.dataModelPrinter()
+            self.firstTable.reloadData()
+        }
+    }
     
     //var items : [String] = [""]
     var itemsToBuildThisTables : TabaleDataModel?{
         didSet{
             guard let unrappedData = itemsToBuildThisTables else { return }
-        
-            let attributedText = NSMutableAttributedString(string: "Group:", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17), NSAttributedString.Key.foregroundColor: UIColor.gray])
-        
-            attributedText.append(NSAttributedString(string: "\n\t\t" + unrappedData.groupData.groupName, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 20)]))
+            
+            let attributedText = NSMutableAttributedString(string: "Group: ", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17), NSAttributedString.Key.foregroundColor: UIColor.gray])
+            
+            attributedText.append(NSAttributedString(string: "\t\t" + unrappedData.groupData.groupName, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 20)]))
             
             descriptionTextView.attributedText = attributedText
             
             firstTable.reloadData()
-        
+            
         }
     }
     
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return (itemsToBuildThisTables?.tasksData.count)!
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = firstTable.dequeueReusableCell(withIdentifier: "cellID") as! TableCell
-        cell.cellTextLabel.text = "   " + (itemsToBuildThisTables?.tasksData[indexPath.row].taskName)!
-//        cell?.textLabel?.text = itemsToBuildThisTables?.tasksData[indexPath.row].taskName
-//        cell?.textLabel?.textAlignment = .left
-//
-//        let iconImageView = UIImageView()
-//        iconImageView.image = UIImage(named: "bear_first")
-//        cell?.addSubview(iconImageView)
-//
-//        iconImageView.translatesAutoresizingMaskIntoConstraints = false
-//
-//        iconImageView.topAnchor.constraint(equalTo: (cell?.topAnchor)!, constant: 20).isActive = true
-//        iconImageView.rightAnchor.constraint(equalTo: (cell?.rightAnchor)!, constant: -40).isActive = true
-//        iconImageView.bottomAnchor.constraint(equalTo: (cell?.bottomAnchor)!).isActive = true
-//        iconImageView.widthAnchor.constraint(equalTo: cell!.heightAnchor, constant: -20).isActive = true
-//
-        //cell.backgroundColor = UIColor.orange
-        return cell
+            let cell = firstTable.dequeueReusableCell(withIdentifier: "cellID") as! TableCell
+       // guard let taskName = "   " + ((itemsToBuildThisTables?.tasksData[indexPath.row].taskName)!) else { return }
+            cell.cellTextLabel.text = "   " + ((itemsToBuildThisTables?.tasksData[indexPath.row].taskName)!)
+            return cell
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
         
-        
-        let more = UITableViewRowAction(style: .normal, title: "Remove") { action, index in
-            print((self.itemsToBuildThisTables?.tasksData[editActionsForRowAt.row].taskID)!)
-            TalkToServer.sharedObject.deleteTask(task_id: (self.itemsToBuildThisTables?.tasksData[editActionsForRowAt.row].taskID)! )
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4){
-                print("try to reload the table+++++")
-                self.firstTable.reloadData()}
+        let remove = UITableViewRowAction(style: .normal, title: "Remove") { action, index in
+            //remove From server
+            TalkToServer.sharedObject.deleteTask(task_id: (self.itemsToBuildThisTables?.tasksData[editActionsForRowAt.row].taskID)!)
+            //self.delegationFromSwipeController.reloadCollectionViews()
+            //DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+            let t = self.pageIndex
+            self.pageIndex = t
+            print("try to reload the table+++++")
+            // self.pageIndex = (TalkToServer.sharedObject.placeOfRemovedItem?.group)!
+            
+            //}
             print("Remove button tapped")
         }
-        more.backgroundColor = .red
+        remove.backgroundColor = .red
         
-        let favorite = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
+        let edit = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
             print("Edit button tapped")
         }
-        favorite.backgroundColor = .lightGray
+        edit.backgroundColor = .lightGray
         
-        let share = UITableViewRowAction(style: .normal, title: "Done") { action, index in
+        let done = UITableViewRowAction(style: .normal, title: "Done") { action, index in
             print("Done button tapped")
         }
-        share.backgroundColor = .green
+        done.backgroundColor = .green
         
-        return [share, favorite, more]
+        return [done, edit, remove]
     }
     
     //Also implement this: (You can make it conditional, but here everything is editable)
@@ -86,8 +95,7 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print((itemsToBuildThisTables?.tasksData[indexPath.row].taskDescription)! )
-        firstTable.action
+        print((itemsToBuildThisTables?.tasksData[indexPath.row].taskDescription) ?? "No Cell" )
         firstTable.deselectRow(at: indexPath, animated: true)
     }
     
@@ -97,13 +105,6 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
         backgroundView.backgroundColor = UIColor.orange
         cell.selectedBackgroundView = backgroundView
     }
-    
-//    let bearImageView : UIImageView = {
-//        let imageView = UIImageView(image: #imageLiteral(resourceName: "bear_first"))
-//        imageView.contentMode = .scaleAspectFit
-//        imageView.translatesAutoresizingMaskIntoConstraints = false
-//        return imageView
-//    }()
     
     let descriptionTextView: UITextView = {
         
@@ -119,7 +120,7 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
         let thisTable = UITableView()
         thisTable.translatesAutoresizingMaskIntoConstraints = false
         thisTable.isScrollEnabled = true
-        thisTable.rowHeight = 50
+        thisTable.rowHeight = 60
         return thisTable
     }()
     
@@ -131,11 +132,12 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
         return image
     }()
     
-
-
+    
+    
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        TalkToServer.sharedObject.accessToPageCellFromTalkToserver = self
         firstTable.dataSource = self as UITableViewDataSource
         firstTable.delegate = self as UITableViewDelegate
         
@@ -156,34 +158,26 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
     private func setupLayout() {
         
         let topImageContainerView = UIView()
-
+        
         self.addSubview(topImageContainerView)
-
+        
         topImageContainerView.translatesAutoresizingMaskIntoConstraints = false
         
-        topImageContainerView.topAnchor.constraint      (equalTo: self.topAnchor                    ).isActive = true
+        topImageContainerView.topAnchor.constraint      (equalTo: self.topAnchor, constant: 50                    ).isActive = true
         topImageContainerView.leadingAnchor.constraint  (equalTo: self.leadingAnchor                ).isActive = true
         topImageContainerView.trailingAnchor.constraint (equalTo: self.trailingAnchor               ).isActive = true
         topImageContainerView.heightAnchor.constraint   (equalTo: self.heightAnchor, multiplier: 0.5).isActive = true
         
         topImageContainerView.backgroundColor = .white
-
-        //topImageContainerView.addSubview(bearImageView)
-
-//        bearImageView.centerXAnchor.constraint(equalTo: topImageContainerView.centerXAnchor                 ).isActive = true
-//        bearImageView.centerYAnchor.constraint(equalTo: topImageContainerView.centerYAnchor                 ).isActive = true
-//        bearImageView.heightAnchor .constraint(equalTo: topImageContainerView.heightAnchor, multiplier: 0.9 ).isActive = true
-//        bearImageView.widthAnchor  .constraint(equalTo: topImageContainerView.widthAnchor , multiplier: 0.8 ).isActive = true
-        //temp
-        //bearImageView.backgroundColor = .red
-
+        
+        
         self.addSubview(descriptionTextView)
         
-        descriptionTextView.topAnchor     .constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: self.bounds.height / 20 ).isActive = true
+        descriptionTextView.topAnchor     .constraint(equalTo: topImageContainerView.safeAreaLayoutGuide.topAnchor, constant: self.bounds.height / 20 ).isActive = true
         descriptionTextView.leadingAnchor .constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor, constant:30).isActive = true
         //descriptionTextView.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         descriptionTextView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor,constant:-30).isActive = true
-        descriptionTextView.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        descriptionTextView.heightAnchor.constraint(equalToConstant: 45).isActive = true
         //descriptionTextView.bottomAnchor  .constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -50          ).isActive = true
         descriptionTextView.backgroundColor = .white
         
@@ -194,9 +188,9 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
         self.addSubview(tableBackGround)
         self.addSubview(firstTable)
         
-        firstTable.topAnchor.constraint(equalTo: tableBackGround.topAnchor, constant: 40).isActive = true
-        firstTable.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 5).isActive = true
-        firstTable.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -5).isActive = true
+        firstTable.topAnchor.constraint(equalTo: tableBackGround.topAnchor, constant: 20).isActive = true
+        firstTable.leftAnchor.constraint(equalTo: tableBackGround.leftAnchor, constant: 10).isActive = true
+        firstTable.rightAnchor.constraint(equalTo: tableBackGround.rightAnchor, constant: -15).isActive = true
         firstTable.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -55).isActive = true
         
         firstTable.backgroundColor = .orange
@@ -204,11 +198,11 @@ class PageCell : UICollectionViewCell, UITableViewDataSource, UITableViewDelegat
         tableBackGround.topAnchor.constraint(equalTo: descriptionTextView.bottomAnchor, constant: 5).isActive = true
         tableBackGround.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 5).isActive = true
         tableBackGround.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -5).isActive = true
-        tableBackGround.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -55).isActive = true
+        tableBackGround.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         
         UIView.animate(withDuration: 5.0, animations: {   })
         
     }
-
-
+    
+    
 }
