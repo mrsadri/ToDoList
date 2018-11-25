@@ -48,17 +48,16 @@ class HomeScreen : UIViewController, toAccessHomeFunctions {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .magenta
-        
+  //      TalkToServer.sharedObject.accessToPageCellFromTalkToserver = PageCell.self as! AccessToPageCell
         self.view.addSubview(timerLabelForLoading)
         
         timerLabelForLoading.frame = CGRect(x: 50, y: 50, width: 100 , height: 100)
         
         TalkToServer.sharedObject.delegetionForThisClass = self
+        TalkToServer.sharedObject.login(email: "masih@sadri.com", password: "123qwe")
         
-        TalkToServer.sharedObject.getGroup()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3){
-            //self.loadTheApplication()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+            TalkToServer.sharedObject.getGroup()
         }
         
     }

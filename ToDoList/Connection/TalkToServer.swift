@@ -14,6 +14,8 @@ var wholeDate = [
     TabaleDataModel(groupData : (groupName: "Group", groupID: "") , tasksData: [(taskName: "String", taskID: "1", taskDescription: "String", doneStatus: true )] )
 ]
 
+
+
 protocol toAccessHomeFunctions {
     func loadTheApplication()
     func setTimerFirstValue(input: String)
@@ -21,21 +23,30 @@ protocol toAccessHomeFunctions {
 
 class TalkToServer {
     
+    //var delegationFromSwipeController : AccessToSwipeController!
+    var accessToPageCellFromTalkToserver : AccessToPageCell!
     var delegetionForThisClass : toAccessHomeFunctions!
     
     var timer:Timer?
     var groupIDKeeperTemp : [String] = []
     
+    var isItFirstTimeToSetWholeData : Bool?
     var isReadyToReload : Bool = false {
         willSet(new){
             if new {
                 self.dataModelPrinter()
                 wholeDate = tableSections
-                print("data is fetched fully")
                 self.delegetionForThisClass.loadTheApplication()
-                //HomeScreen.sharedObject.loadTheApplication()
-                
             }
+            
+            if !isItFirstTimeToSetWholeData! {
+                /* 1. Inject Data step by Step Through classe te aproach it to "itemsToReloadTable"
+                 (as example reWrite PageIndex to fetch its Owndata again and reload the table)*/
+                accessToPageCellFromTalkToserver.resetPageIndex()
+            } else {
+                isItFirstTimeToSetWholeData = false
+            }
+            
         }
     }
     
@@ -43,6 +54,7 @@ class TalkToServer {
     
     var tokenKeeper : String = "" {
         didSet{
+            print("The new ttoken is \(tokenKeeper)")
             //TODO: write the token to the PList evenif it is ""
             /* if token == "" {present login view} else {
              1: Update self.tableRows
@@ -58,6 +70,7 @@ class TalkToServer {
     }
     var userData : (firstName: String, lastName: String) = ("",""){
         didSet{
+            print("This is UserData: \(userData)")
             //Call VC func to write name again
             //Write name to the PList
         }
@@ -93,25 +106,6 @@ class TalkToServer {
             }
         }
         
-        //        Alamofire.request( thisUrl, method: .post , parameters: bodyparameters , headers: headers).responseJSON{ response in
-        //            if response.result.isSuccess{
-        //                let jsonKeeperBody      : JSON = JSON(response.result.value!)
-        //                let jsonKeeperHeader    : JSON = JSON(response.response!.allHeaderFields)
-        //                print("-+--------")
-        //                print(jsonKeeperBody)
-        //                print(jsonKeeperHeader)
-        //                print("-++-------")
-        //                        self.tokenKeeper = jsonKeeperHeader["token"].stringValue
-        //                //set name and lastName
-        //                self.userData.firstName = jsonKeeperBody  ["body"]["first_name"].stringValue
-        //                self.userData.lastName  = jsonKeeperHeader["body"]["last_name" ].stringValue
-        //            } else {
-        //                print("-__-------")
-        //                print("Error: \(String(describing: response.result.error))")
-        //                self.tokenKeeper = ""
-        //            }
-        //        }
-        
     }
     
     func login(email: String, password: String) {
@@ -124,9 +118,9 @@ class TalkToServer {
         requester(url: thisUrl, headers: headers, bodyparameters: bodyparameters)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+            print(self.responseKeeper)
             
             if self.responseKeeper.body["message"].stringValue == "ok" {
-                print(self.responseKeeper)
                 self.tokenKeeper = self.responseKeeper.header["token"].stringValue
                 self.userData.firstName = self.responseKeeper.body  ["body"]["first_name"].stringValue
                 self.userData.lastName  = self.responseKeeper.body["body"]["last_name" ].stringValue
@@ -134,27 +128,6 @@ class TalkToServer {
                 self.tokenKeeper = ""
             }
         }
-        
-        //        Alamofire.request( thisUrl, method: .post , parameters: bodyparameters , headers: headers).responseJSON{ response in
-        //            if response.result.isSuccess{
-        //                let jsonKeeperBody : JSON = JSON(response.result.value!)
-        //                let jsonKeeperHeader : JSON = JSON(response.response!.allHeaderFields)
-        //                print("-+--------")
-        //                print(jsonKeeperBody)
-        //                print(jsonKeeperHeader)
-        //                print("-++-------")
-        //                self.tokenKeeper = jsonKeeperHeader["token"].stringValue
-        //                //set name and lastName
-        //                self.userData.firstName = jsonKeeperBody  ["body"]["first_name"].stringValue
-        //                self.userData.lastName  = jsonKeeperHeader["body"]["last_name" ].stringValue
-        //                successFlag = true
-        //            } else {
-        //                print("-__-------")
-        //                print("Error: \(String(describing: response.result.error))")
-        //                self.tokenKeeper = ""
-        //                successFlag = false
-        //            }
-        //        }
         
     }
     
@@ -178,19 +151,6 @@ class TalkToServer {
                 //nothing
             }
         }
-        
-        //        Alamofire.request( thisUrl, method: .post , parameters: bodyparameters , headers: headers).responseJSON{ response in
-        //            if response.result.isSuccess{
-        //                let jsonKeeperBody : JSON = JSON(response.result.value!)
-        //                //let jsonKeeperHeader : JSON = JSON(response.response!.allHeaderFields)
-        //                print(jsonKeeperBody)
-        //            } else {
-        //                print("-__-------")
-        //                print("Error: \(String(describing: response.result.error))")
-        //                self.tokenKeeper = ""
-        //            }
-        //        }
-        
     }
     
     func deleteGroup(group_id: String)  {
@@ -224,6 +184,7 @@ class TalkToServer {
     
     func getGroup(group_id: String = "1") {
         //- BUG: GroupId is not neccesary here, just the token is matter
+        isItFirstTimeToSetWholeData = true
         
         let thisUrl = "http://buzztaab.com:8081/api/getGroup/"
         let headers: HTTPHeaders = ["authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk", //  "Bearer +\(tokenKeeper)",
@@ -260,7 +221,7 @@ class TalkToServer {
                         self.tableSections.append(newElementM)
                         
                         self.groupIDKeeperTemp.append(groupDataM.groupID)
-
+                        
                         //                    self.tableRows[index].groupData.groupID   = self.responseKeeper.body["body"][index]["id"  ].stringValue
                         //                    self.tableRows[index].groupData.groupName = self.responseKeeper.body["body"][index]["name"].stringValue
                     }
@@ -280,7 +241,7 @@ class TalkToServer {
         //here tell to Home Screen How much does it take
         DispatchQueue.main.asyncAfter(deadline: .now() + 1){
             let howManyGroups : String = String(self.tableSections.count * 2 + 2)
-        self.delegetionForThisClass.setTimerFirstValue(input: howManyGroups)
+            self.delegetionForThisClass.setTimerFirstValue(input: howManyGroups)
         }
     }
     
@@ -331,13 +292,24 @@ class TalkToServer {
         //BUG: API, when create a task in the none exist group server does not respond in a proper way.
         
         let thisUrl = "http://buzztaab.com:8081/api/createTask/"
-        let headers: HTTPHeaders = ["authorization" :/* "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk"*/  "Bearer +\(tokenKeeper)",
+        let headers: HTTPHeaders = ["authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk" ,// "Bearer +\(tokenKeeper)",
             "Content-Type": "application/x-www-form-urlencoded"]
         let bodyparameters = ["group_id": group_id ,
                               "taskName":taskName,
                               "taskDescription":taskDescription,
                               "executionTime" : "fd" ]
-        
+        //LocalSide:
+        for index in 0...(self.tableSections.count - 1){
+            if self.tableSections[index].groupData.groupID == group_id {
+                
+                let newTask = (taskName: taskName, taskID: "0", taskDescription: taskDescription, doneStatus: false)
+                
+                self.tableSections[index].tasksData.append(newTask)
+                isReadyToReload = true
+                //TODO: write self.tableRows to Plist and reload table
+            }
+        }
+        //serverSide:
         requester(url: thisUrl, headers: headers, bodyparameters: bodyparameters)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2){
@@ -350,6 +322,7 @@ class TalkToServer {
                         
                         let newTask = (taskName: taskName, taskID: self.responseKeeper.body["body"]["id"].stringValue, taskDescription: taskDescription, doneStatus: false)
                         
+                        self.tableSections[index].tasksData.removeLast()
                         self.tableSections[index].tasksData.append(newTask)
                         //TODO: write self.tableRows to Plist and reload table
                     }
@@ -362,7 +335,26 @@ class TalkToServer {
         }
     }
     
+    var placeOfRemovedItem : (group: Int, task: Int)?
     func deleteTask(task_id: String) {
+        
+        {
+            //count the JSON parameters in body then write a for here
+            for gIndex in 0...(self.tableSections.count - 1){
+                if self.tableSections[gIndex].tasksData.count != 0 {
+                    for tIndex in 0...(self.tableSections[gIndex].tasksData.count - 1) {
+                        if (self.tableSections[gIndex].tasksData[tIndex].taskID == task_id){
+                            self.placeOfRemovedItem = (group: gIndex, task: tIndex)
+                        }//End If // find item
+                    }// End For tIndex
+                }//End If (!is group empty)
+            }//End For gIndex
+            //TODO: unwrapp placeOfRemovedItem by Guard let
+            self.tableSections[self.placeOfRemovedItem!.group].tasksData.remove(at: self.placeOfRemovedItem!.task)
+            self.isReadyToReload = true
+            //TODO: write self.tableRows to Plist and reload table
+        }()
+        
         let thisUrl = "http://buzztaab.com:8081/api/deleteTask/"
         let headers: HTTPHeaders = ["authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzYwYWM4ZWQtMzhkMy00ZjUzLWE3YjItOWFkOWIzYmRhNjRhIiwiaWF0IjoxNTM5MjUwNTg2fQ.exeb-WXsM06aWMtInkQcaoK7hKJ9NGrUpQUsHkKBdIk", //  "Bearer +\(tokenKeeper)",
             "Content-Type": "application/x-www-form-urlencoded"]
@@ -371,31 +363,28 @@ class TalkToServer {
         
         requester(url: thisUrl, headers: headers, bodyparameters: bodyparameters)
         
-        var isDeletedM : Bool = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
-            // BUG: server always rspond "OK"
-            if self.responseKeeper.body["message"].stringValue == "ok" {
-                print(self.responseKeeper)
-                //count the JSON parameters in body then write a for here
-                
-                for gIndex in 0...(self.tableSections.count - 1){
-                    if self.tableSections[gIndex].tasksData.count != 0 {
-                        for tIndex in 0...(self.tableSections[gIndex].tasksData.count - 1) {
-                            if (self.tableSections[gIndex].tasksData[tIndex].taskID == task_id && !isDeletedM){
-                                self.tableSections[gIndex].tasksData.remove(at: tIndex)
-                                wholeDate = self.tableSections
-                                //self.isReadyToReload = true
-                                isDeletedM = true
-                            }
-                        }
-                    }
-                }
-                //TODO: write self.tableRows to Plist and reload table
-                
-            } else {
-                //nothing
-            }
-        }
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+        //            // BUG: server always rspond "OK"
+        //            if self.responseKeeper.body["message"].stringValue == "ok" {
+        //                print(self.responseKeeper)
+        //                //count the JSON parameters in body then write a for here
+        //                for gIndex in 0...(self.tableSections.count - 1){
+        //                    if self.tableSections[gIndex].tasksData.count != 0 {
+        //                        for tIndex in 0...(self.tableSections[gIndex].tasksData.count - 1) {
+        //                            if (self.tableSections[gIndex].tasksData[tIndex].taskID == task_id){
+        //                                self.placeOfRemovedItem = (group: gIndex, task: tIndex)
+        //                            }//End If // find item
+        //                        }// End For tIndex
+        //                    }//End If (!is group empty)
+        //                }//End For gIndex
+        //                //TODO: unwrapp placeOfRemovedItem by Guard let
+        //                self.tableSections[self.placeOfRemovedItem!.group].tasksData.remove(at: self.placeOfRemovedItem!.task)
+        //                self.isReadyToReload = true
+        //                //TODO: write self.tableRows to Plist and reload table
+        //            } else {
+        //                //nothing
+        //            }
+        //        }
         
     }
     

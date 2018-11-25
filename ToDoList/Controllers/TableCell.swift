@@ -32,7 +32,6 @@ class TableCell : UITableViewCell {
         super.setSelected(selected, animated: animated)
         self.addSubview(cellTextLabel)
         cellTextLabel.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-
         cellTextLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         cellTextLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
         cellTextLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
